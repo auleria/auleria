@@ -1,4 +1,5 @@
 # Project Auleria
+Project Auleria is a semi-ambitious game, currently in development. You can have a look at the [current Project Plan](https://github.com/auleria/auleria/wiki/Project-Plan) to see what is in store!
 
 ## Contributing
 This project is exclusively written in [TypeScript](https://www.typescriptlang.org/).
