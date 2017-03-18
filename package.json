@@ -1,0 +1,52 @@
+{
+  "name": "auleria",
+  "version": "0.0.1",
+  "description": "A game?",
+  "main": "bin/server/app.js",
+  "scripts": {
+    "start": "node bin/server/app.js",
+    "build": "npm-run-all build:*",
+    "build:server": "tsc",
+    "watch:buildclient": "watchify src/client/app.ts --debug -p [ tsify ] -o bin/client/bundle.js",
+    "watch:buildserver": "tsc --watch",
+    "watch:nodemon": "nodemon --delay 1 --watch bin/server",
+    "watch": "npm-run-all --parallel watch:*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/auleria/auleria"
+  },
+  "keywords": [
+    "threejs",
+    "typescript",
+    "boilerplate"
+  ],
+  "contributors": [
+    {
+      "name": "Rasmus Israelsson",
+      "email": "IsraelssonRasmusRaz@gmail.com",
+      "url": "https://github.com/rasmusir/"
+    },
+    {
+      "name": "Peter Kjellén",
+      "email": "peter.kjellen@gmail.com",
+      "url": "https://github.com/Zalodu/"
+    }
+  ],
+  "license": "GNU GPL v3.0",
+  "bugs": {
+    "url": "https://github.com/auleria/auleria/issues"
+  },
+  "homepage": "https://github.com/auleria/auleria#readme",
+  "dependencies": {
+    "@types/three": "^0.84.2",
+    "ejs": "^2.5.6",
+    "express": "^4.15.2",
+    "nodemon": "^1.11.0",
+    "npm-run-all": "^4.0.2",
+    "three": "^0.84.0",
+    "tsify": "^3.0.1",
+    "typescript": "^2.2.1",
+    "watchify": "^3.9.0"
+  }
+}

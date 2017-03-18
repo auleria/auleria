@@ -1,0 +1,6 @@
+# Compiled stuff
+bin/**/*.js
+bin/**/*.js.map
+
+# Node dependencies
+node_modules/
