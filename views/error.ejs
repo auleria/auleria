@@ -1,0 +1,13 @@
+<!doctype html>
+<html>
+    <head>
+        <title><%=title%></title>
+    </head>
+    <body>
+		<div class="errorMessage">
+			Error <%=statusCode%>: <%=message%>
+			<br/>
+			<a href="/" onclick="event.preventDefault(); window.history.back()">Press here to go back to the previous page.</a>
+		</div>
+    </body>
+</html>
