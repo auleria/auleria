@@ -1,38 +1,29 @@
 import {Remote} from "./Remote";
+import {Helper} from "./Helper";
 
-export class GameObject
+export abstract class GameObject
 {
 	@Remote.once
 	@Remote.master
-	private id : string;
+	private _id : string;
+
+	public get id() { return this._id; }
 
 	@Remote.master
-	private transform : ITransform;
+	public transform : ITransform;
 
 	constructor()
 	{
-		
+		this._id = Helper.generateID();
 	}
 
-	initialize()
-	{
+	public abstract initialize() : void
 
-	}
+	public abstract masterUpdate() : void
 
-	masterUpdate()
-	{
-		this.transform.position.x += 0.1;
-	}
+	public abstract slaveUpdate() : void
 
-	slaveUpdate()
-	{
-		
-	}
-
-	destroy()
-	{
-
-	}
+	public abstract destroy() : void
 }
 
 interface ITransform
