@@ -8,6 +8,7 @@ const app = express();
 app.set("view engine", "ejs");
 app.use("/bin", express.static("bin/client"));
 app.use("/content", express.static("content"));
+app.use("/views", express.static("views"));
 
 app.get("/", (req, res) => {
 	res.render("index", {
