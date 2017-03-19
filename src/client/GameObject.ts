@@ -2,16 +2,16 @@ import {Remote} from "./Remote";
 
 export class GameObject
 {
+	@Remote.once
+	@Remote.master
 	private id : string;
 
 	@Remote.master
 	private transform : ITransform;
-	@Remote.bi
-	private name : string;
 
-	constructor(name : string)
+	constructor()
 	{
-		this.name = name;
+		
 	}
 
 	initialize()
