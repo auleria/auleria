@@ -45,6 +45,7 @@
     "express": "^4.15.2",
     "nodemon": "^1.11.0",
     "npm-run-all": "^4.0.2",
+    "rand-token": "^0.3.0",
     "three": "^0.84.0",
     "tsify": "^3.0.1",
     "tslint": "^4.5.1",
