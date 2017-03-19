@@ -39,7 +39,7 @@ export class GameMaster
 			peer.on("connection", (connection:any) => this.onClientConnected(connection));
 		});
 
-		(new PeerJSDebugController(peer)).show();
+		//(new PeerJSDebugController(peer)).show();
 
 		this.type = type;
 		if (type === masterType.WORKER)
@@ -49,7 +49,7 @@ export class GameMaster
 		}
 		else
 		{
-			
+			throw new Error("Not yet implemented");
 		}
 	}
 
