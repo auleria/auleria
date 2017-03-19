@@ -1,3 +1,5 @@
+import {PeerJSDebugController} from "./controllers/PeerJSDebugController";
+
 let randtoken = require("rand-token");
 
 enum masterType {WORKER, REMOTE};
@@ -33,7 +35,11 @@ export class GameMaster
 
 		peer.on("open", (id : any) => {
 			console.log("connection open, id got:", id);
+
+			peer.on("connection", (connection:any) => this.onClientConnected(connection));
 		});
+
+		(new PeerJSDebugController(peer)).show();
 
 		this.type = type;
 		if (type === masterType.WORKER)
@@ -45,6 +51,11 @@ export class GameMaster
 		{
 			
 		}
+	}
+
+	private onClientConnected(connection: any)
+	{
+		console.log("Someone connected! Their id is", connection.peer);
 	}
 
 	private handleMessage(event : MessageEvent)
