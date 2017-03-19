@@ -10,7 +10,7 @@
       "outDir": "bin/server"
     },
     "files": [
-        "src/server/app.ts"
+        "src/server/Application.ts"
     ],
     "exclude": [
       "node_modules",
