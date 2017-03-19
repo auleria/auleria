@@ -5,16 +5,17 @@ export abstract class GameObject
 {
 	@Remote.once
 	@Remote.master
-	private _id : string;
+	private _id = Helper.generateID();
 
 	public get id() { return this._id; }
 
 	@Remote.master
-	public transform : ITransform;
+	@Helper.sealed
+	public transform = {rotation: new THREE.Quaternion, position: new THREE.Vector3(), scale: new THREE.Vector3()};
 
-	constructor()
+	public preInitialize()
 	{
-		this._id = Helper.generateID();
+
 	}
 
 	public abstract initialize() : void
