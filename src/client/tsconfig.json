@@ -2,6 +2,9 @@
     "compilerOptions": {
       "noImplicitAny": true,
       "experimentalDecorators": true,
-      "lib": ["es2015", "webworker"]
-    }
+      "lib": ["es2015", "webworker", "dom"]
+    },
+    "exclude": [
+      "node_modules"
+    ]
 }
