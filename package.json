@@ -7,7 +7,7 @@
     "start": "node bin/server/app.js",
     "build": "npm-run-all build:*",
     "build:server": "tsc",
-    "watch:buildclient": "watchify src/client/app.ts --debug -p [ tsify ] -o bin/client/bundle.js",
+    "watch:buildclient": "watchify src/client/Application.ts --debug -p [ tsify ] -o bin/client/bundle.js",
     "watch:buildserver": "tsc --watch",
     "watch:nodemon": "nodemon --delay 1 --watch bin/server",
     "watch": "npm-run-all --parallel watch:*"
