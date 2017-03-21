@@ -1,21 +1,25 @@
-import {Remote} from "./Remote";
-import {Helper} from "./Helper";
+import { Remote, IPropertyPair } from "./Remote";
+import { Helper } from "./Helper";
+import { GameWorld } from "./game/GameWorld";
+import { Transform } from "./game/Transform";
 
 export abstract class GameObject
 {
-	@Remote.once
-	@Remote.master
+	@Remote.monitor(Remote.DIRECTION.MASTER_TO_SLAVE)
 	private _id = Helper.generateID();
 
 	public get id() { return this._id; }
 
-	@Remote.master
+	private _world : GameWorld;
+	public get world() { return this._world; }
+
+	@Remote.monitor(Remote.DIRECTION.MASTER_TO_SLAVE)
 	@Helper.sealed
-	public transform = {rotation: new THREE.Quaternion, position: new THREE.Vector3(), scale: new THREE.Vector3()};
+	public transform = new Transform();
 
-	public preInitialize()
+	public preInitialize(world : GameWorld)
 	{
-
+		this._world = world;
 	}
 
 	public abstract initialize() : void
@@ -27,10 +31,9 @@ export abstract class GameObject
 	public abstract destroy() : void
 }
 
-interface ITransform
+export interface IGameObjectData
 {
-	rotation : THREE.Quaternion;
-	position : THREE.Vector3;
-	scale : THREE.Vector3;
+	id : string;
+	type : string;
+	properties : IPropertyPair[];
 }
-
