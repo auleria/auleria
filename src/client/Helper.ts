@@ -8,4 +8,9 @@ export class Helper
 	{
 		return randtoken.generate(Helper.ID_SIZE);
 	}
+
+	public static sealed(target: any, property: string)
+	{
+		Object.seal(target[property]);
+	}
 }
