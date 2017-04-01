@@ -31,7 +31,7 @@ export class GameSlave
 						type = buffer.readString();
 						id = buffer.readId();
 						console.log("World created! type:", type, "id:", id);
-						let worldType = Classes.getClass(type).type;
+						let worldType = Classes.getClass(type);
 						let world = new worldType();
 						abort = true;
 						break;

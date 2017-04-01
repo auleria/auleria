@@ -7,9 +7,9 @@ export class Classes
 		Classes.classes.set(targetClass.name, targetClass);
 	}
 
-	public static getClass(name : string)
+	public static getClass(name : string) : any
 	{
-		return Classes.classes.get(name);
+		return Classes.classes.has(name) ? Classes.classes.get(name).type : null;
 	}
 }
 
