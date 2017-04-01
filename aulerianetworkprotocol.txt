@@ -1,0 +1,12 @@
+WorldData:
+	id : 8B
+	EventData : [
+		id : 1B
+		data : ?
+	]
+	objectCount : 2B
+	objects : [
+		id : 8B
+		length : 4B
+		objectData : length
+	]

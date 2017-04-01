@@ -2,9 +2,9 @@ let randtoken = require("rand-token");
 
 export class Helper
 {
-	private static ID_SIZE = 8;
+	public static readonly ID_SIZE = 8;
 
-	public static generateID()
+	public static generateID() : string
 	{
 		return randtoken.generate(Helper.ID_SIZE);
 	}

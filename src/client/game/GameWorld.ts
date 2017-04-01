@@ -1,16 +1,27 @@
 import { GameObject, IGameObjectData } from "../GameObject";
 import { Helper } from "../Helper";
 import { Remote } from "../Remote";
+import { ByteBuffer } from "../ByteBuffer";
 
+enum WorldEvent {
+	CREATE_OBJECT
+};
 
 export abstract class GameWorld
 {
-	private id : string;
+	private _id : string;
 	private gameObjects = new Map<string, GameObject>();
+	private byteBuffer : ByteBuffer;
+	private _isMaster : boolean;
+	public get isMaster() { return this._isMaster; }
+	public get id() { return this._id; }
 
-	constructor()
+	constructor(isMaster : boolean)
 	{
-		this.id = Helper.generateID();
+		this._id = Helper.generateID();
+		this.byteBuffer = new ByteBuffer();
+		this.byteBuffer.writeId(this._id);
+		this._isMaster = isMaster;
 	}
 
 	public initialize()
@@ -18,31 +29,65 @@ export abstract class GameWorld
 		//TODO: initialize
 	}
 
+	public tick()
+	{
+		for (let kvp of this.gameObjects)
+		{
+			let object = kvp[1];
+			object.tick();
+		}
+	}
+
 	public add<T extends GameObject>(object : T) : T
 	{
 		object.preInitialize(this);
 		object.initialize();
 		this.gameObjects.set(object.id, object);
+
+		if (this.isMaster)
+		{
+			this.byteBuffer.writeByte(WorldEvent.CREATE_OBJECT);
+			this.byteBuffer.writeString(object.constructor.name);
+			this.writeObjectData(object);
+		}
+
 		return object;
 	}
 
-	public getCreationData() : {}
+	public setBuffer(buffer : ByteBuffer)
 	{
-		let data = {
-			id : this.id,
-			type: this.constructor.name,
-			objects : new Array<IGameObjectData>(this.gameObjects.size)
-		};
-		let i = 0;
+		this.byteBuffer = buffer;
+	}
 
-		this.gameObjects.forEach(object => {
-			data.objects[i++] = <IGameObjectData>{
-				id: object.id,
-				type: (object as any).constructor.name,
-				properties: Remote.getProperties(object)
-			};
-		});
+	public writeToBuffer() : ByteBuffer
+	{
+		this.writeUpdateData();
+		return this.byteBuffer;
+	}
 
-		return data;
+	private writeUpdateData()
+	{
+		this.byteBuffer.writeShort(this.gameObjects.size);
+
+		for (let kvp of this.gameObjects)
+		{
+			let object = kvp[1];
+			this.writeObjectData(object);
+		}
+	}
+
+	private writeObjectData(object : GameObject)
+	{
+		let prevPos = this.byteBuffer.position;
+		this.byteBuffer.seek(prevPos + Helper.ID_SIZE + 4);
+		if ( object.writeToBuffer(this.byteBuffer) )
+		{
+			let curPos = this.byteBuffer.position;
+			this.byteBuffer.seek(prevPos);
+			this.byteBuffer.writeId(object.id);
+			this.byteBuffer.writeInt32(curPos - prevPos - Helper.ID_SIZE - 4);
+			this.byteBuffer.seek(curPos);
+		}
 	}
 }
+

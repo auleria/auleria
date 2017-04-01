@@ -1,6 +1,9 @@
 import { Remote } from "../../Remote";
 import { GameObject } from "../../GameObject";
+import { ByteBuffer } from "../../ByteBuffer";
+import { Classes } from "../../Classes";
 
+@Classes.register
 export class DebugObject extends GameObject
 {
 	@Remote.monitor(Remote.DIRECTION.BI)
@@ -16,12 +19,18 @@ export class DebugObject extends GameObject
 		console.log("Debug object created! :D");
 	}
 
-	public masterUpdate(): void {
-		throw new Error('Method not implemented.');
+	public writeToBuffer(bb : ByteBuffer)
+	{
+		this.transform.writeToBuffer(bb);
+		return true;
 	}
 
-	public slaveUpdate(): void {
-		throw new Error('Method not implemented.');
+	public tick(): void {
+		
+	}
+
+	public update(): void {
+
 	}
 
 	public destroy(): void {

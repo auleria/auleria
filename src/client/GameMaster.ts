@@ -1,4 +1,5 @@
-import {PeerJSDebugController} from "./controllers/PeerJSDebugController";
+import { PeerJSDebugController } from "./controllers/PeerJSDebugController";
+import { ByteBuffer } from "./ByteBuffer";
 
 let randtoken = require("rand-token");
 
@@ -11,6 +12,8 @@ export class GameMaster
 
 	private type : masterType;
 	private worker : Worker;
+
+	private messageListener : Function;
 
 	public static CreateFromWorker()
 	{
@@ -53,13 +56,19 @@ export class GameMaster
 		}
 	}
 
+	public setListener(func : (buffer: ByteBuffer) => void)
+	{
+		this.messageListener = func;
+	}
+
 	private onClientConnected(connection: any)
 	{
 		console.log("Someone connected! Their id is", connection.peer);
 	}
 
-	private handleMessage(event : MessageEvent)
+	private handleMessage(message : MessageEvent)
 	{
-
+		let buffer = new ByteBuffer(message.data.data);
+		this.messageListener(buffer);
 	}
 }
