@@ -6,31 +6,33 @@ import { Classes } from "../../Classes";
 @Classes.register
 export class DebugObject extends GameObject
 {
-	@Remote.monitor(Remote.DIRECTION.BI)
 	public name : string;
 
-	constructor(name : string = "Hank")
+	constructor(name : string = "Hankerino")
 	{
 		super();
 		this.name = name;
 	}
 
 	public initialize(): void {
-		console.log("Debug object created! :D");
+		console.log("Debug object created! My name is", this.name, "and my id is", this.id);
 	}
 
-	public writeToBuffer(bb : ByteBuffer)
+	public writeToBuffer(buffer : ByteBuffer)
 	{
-		this.transform.writeToBuffer(bb);
+		buffer.writeString(this.name);
 		return true;
 	}
 
+	public readFromBuffer(buffer : ByteBuffer)
+	{
+		this.name = buffer.readString();
+	}
+
 	public tick(): void {
-		
 	}
 
 	public update(): void {
-
 	}
 
 	public destroy(): void {

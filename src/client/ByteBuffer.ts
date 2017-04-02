@@ -3,11 +3,21 @@
  */
 import { Helper } from "./Helper";
 
+enum types {
+	BYTE = 1,
+	SHORT = 2,
+	INTEGER = 4,
+	ID = 8
+};
+
 export class ByteBuffer
 {
 	private arrayBuffer : ArrayBuffer;
 	private dataView : DataView;
 	private _position : number;
+	private limitPosition = Infinity;
+
+	private measurePointStart : number;
 
 	public get position() { return this._position; }
 
@@ -31,7 +41,7 @@ export class ByteBuffer
 		this._position = position;
 	}
 
-	private moveForward(count : number)
+	public moveForward(count : number)
 	{
 		if (this._position + 16 > this.dataView.byteLength)
 		{
@@ -59,9 +69,32 @@ export class ByteBuffer
 
 	public gotData()
 	{
-		return this._position < this.arrayBuffer.byteLength;
+		return this._position < Math.min(this.arrayBuffer.byteLength, this.limitPosition);
 	}
 
+	public limit(position : number)
+	{
+		this.limitPosition = position;
+	}
+
+	public removeLimit()
+	{
+		this.limitPosition = Infinity;
+	}
+
+	public createMeasurePoint()
+	{
+		this.moveForward(types.INTEGER);
+		this.measurePointStart = this.position;
+	}
+
+	public writeMeasure()
+	{
+		let curpos = this.position;
+		this.seek(this.measurePointStart - types.INTEGER);
+		this.writeInt32(curpos - this.measurePointStart);
+		this.seek(curpos);
+	}
 
 	public writeByte(value : number)
 	{

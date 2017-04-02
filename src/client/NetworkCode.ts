@@ -1,6 +1,9 @@
 export enum NetworkCode {
+	//Worlds
 	CREATE_WORLD,
+	WORLD_DATA,
+	//Objects
 	CREATE_OBJECT,
-
-	WORLD_DATA
+	OBJECT_DATA,
+	OBJECT_INITIALIZATION
 }

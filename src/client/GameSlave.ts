@@ -21,30 +21,42 @@ export class GameSlave
 		let abort = false;
 		while (buffer.gotData() && !abort)
 		{
-			try
+			let eventID = buffer.readByte();
+
+			switch (eventID)
 			{
-				let eventID = buffer.readByte();
-				let type, id;
-				switch (eventID)
-				{
-					case NetworkCode.CREATE_WORLD:
-						type = buffer.readString();
-						id = buffer.readId();
-						console.log("World created! type:", type, "id:", id);
-						let worldType = Classes.getClass(type);
-						let world = new worldType();
-						abort = true;
-						break;
-					case NetworkCode.WORLD_DATA:
-						id = buffer.readId();
-					default:
-						abort = true;
-				}
-			}
-			catch (e)
-			{
-				console.error("Frame broken, scrapping.");
+				case NetworkCode.CREATE_WORLD:
+					this.createWorld(buffer.readString(), buffer.readId(), buffer);
+					break;
+				case NetworkCode.WORLD_DATA:
+					this.updateWorld(buffer.readId(), buffer);
+					break;
+				default:
+					abort = true;
+					console.warn("Got unknown event id:", eventID);
 			}
 		}
+	}
+
+	public createWorld(type : string, id : string, buffer : ByteBuffer)
+	{
+		console.log("World created! type:", type, "id:", id);
+		let worldType = Classes.getClass(type);
+		let world = new worldType(id, false) as GameWorld;
+		let bytecount = buffer.readInt32();
+		buffer.limit(buffer.position + bytecount);
+		world.initialize();
+		world.readFromBuffer(buffer);
+		buffer.removeLimit();
+		this.worlds.set(id, world);
+	}
+
+	public updateWorld(id : string, buffer : ByteBuffer)
+	{
+		let world = this.worlds.get(id);
+		let bytecount = buffer.readInt32();
+		buffer.limit(buffer.position + bytecount);
+		world.readFromBuffer(buffer);
+		buffer.removeLimit();
 	}
 }

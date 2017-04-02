@@ -7,11 +7,13 @@ import { Classes } from "../../Classes";
 @Classes.register
 export class DebugWorld extends GameWorld
 {
-	constructor(isMaster : boolean)
+	public initialize()
 	{
-		super(isMaster);
-		this.add(new DebugObject());
-		this.add(new DebugObject("Toni"));
-		this.add(new DebugObject("Rita"));
+		if (this.isMaster)
+		{
+			this.add(new DebugObject());
+			this.add(new DebugObject("Toni"));
+			this.add(new DebugObject("Rita1234512345"));
+		}
 	}
 }

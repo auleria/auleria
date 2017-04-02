@@ -13,15 +13,19 @@ export class GameWorker
 	{
 		this.buffer = new ByteBuffer();
 		this.createWorld();
+		this.sendMessage();
 		setInterval(() => this.tick(), 1000 / 20);
 	}
 
 	private tick()
 	{
+		this.buffer.writeByte(NetworkCode.WORLD_DATA);
+		this.buffer.writeId(this.world.id);
+		this.buffer.createMeasurePoint();
 		this.world.setBuffer(this.buffer);
 		this.world.tick();
 		this.world.writeToBuffer();
-
+		this.buffer.writeMeasure();
 		this.sendMessage();
 	}
 
@@ -34,10 +38,14 @@ export class GameWorker
 
 	private createWorld()
 	{
-		this.world = new DebugWorld(true);
-		this.world.initialize();
+		this.world = new DebugWorld();
 		this.buffer.writeByte(NetworkCode.CREATE_WORLD);
 		this.buffer.writeString(this.world.constructor.name);
 		this.buffer.writeId(this.world.id);
+		this.buffer.createMeasurePoint();
+		this.world.setBuffer(this.buffer);
+		this.world.initialize();
+		this.world.writeToBuffer();
+		this.buffer.writeMeasure();
 	}
 }

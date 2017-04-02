@@ -1,7 +1,7 @@
 
 export class Classes
 {
-	private static classes = new Map<string, IClassMeta>();
+	private static classes = new Map<string, any>();
 	public static register(targetClass : any)
 	{
 		Classes.classes.set(targetClass.name, targetClass);
@@ -9,12 +9,11 @@ export class Classes
 
 	public static getClass(name : string) : any
 	{
-		return Classes.classes.has(name) ? Classes.classes.get(name).type : null;
+		if (Classes.classes.has(name))
+		{
+			let constructor = Classes.classes.get(name);
+			return constructor;
+		}
+		return null;
 	}
-}
-
-interface IClassMeta
-{
-	name : string;
-	type : any;
 }

@@ -16,8 +16,9 @@ export abstract class GameObject
 	@Helper.sealed
 	public transform = new Transform();
 
-	public preInitialize(world : GameWorld)
+	public preInitialize(world : GameWorld, id? : string)
 	{
+		this._id = id || this._id;
 		this._world = world;
 	}
 
@@ -32,6 +33,11 @@ export abstract class GameObject
 	public writeToBuffer(bb : ByteBuffer)
 	{
 		return false;
+	}
+
+	public readFromBuffer(bb : ByteBuffer)
+	{
+		return;
 	}
 }
 
