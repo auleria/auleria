@@ -31,6 +31,15 @@ export abstract class GameWorld
 		}
 	}
 
+	public update()
+	{
+		for (let kvp of this.gameObjects)
+		{
+			let object = kvp[1];
+			object.update();
+		}
+	}
+
 	public add<T extends GameObject>(object : T) : T
 	{
 		object.preInitialize(this);

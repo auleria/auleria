@@ -29,7 +29,7 @@ export class ByteBuffer
 		}
 		else
 		{
-			this.arrayBuffer = new ArrayBuffer(4096);
+			this.arrayBuffer = new ArrayBuffer(64000);
 		}
 		this.dataView = new DataView(this.arrayBuffer);
 		this._position = 0;

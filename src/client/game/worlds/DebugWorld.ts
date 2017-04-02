@@ -11,9 +11,10 @@ export class DebugWorld extends GameWorld
 	{
 		if (this.isMaster)
 		{
-			this.add(new DebugObject());
-			this.add(new DebugObject("Toni"));
-			this.add(new DebugObject("Rita1234512345"));
+			for (let i = 0; i < 20; i++)
+			{
+				this.add(new DebugObject(i.toString()));
+			}
 		}
 	}
 }

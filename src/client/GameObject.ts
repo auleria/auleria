@@ -7,11 +7,11 @@ import { ByteBuffer } from "./ByteBuffer";
 export abstract class GameObject
 {
 	private _id = Helper.generateID();
+	private _world : GameWorld;
 
 	public get id() { return this._id; }
-
-	private _world : GameWorld;
 	public get world() { return this._world; }
+	public get isMaster() { return this._world.isMaster; }
 
 	@Helper.sealed
 	public transform = new Transform();

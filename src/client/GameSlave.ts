@@ -14,6 +14,7 @@ export class GameSlave
 	{
 		this.master = master;
 		this.master.setListener(buffer => this.handleMessage(buffer));
+		this.render();
 	}
 
 	public handleMessage(buffer: ByteBuffer)
@@ -40,7 +41,6 @@ export class GameSlave
 
 	public createWorld(type : string, id : string, buffer : ByteBuffer)
 	{
-		console.log("World created! type:", type, "id:", id);
 		let worldType = Classes.getClass(type);
 		let world = new worldType(id, false) as GameWorld;
 		let bytecount = buffer.readInt32();
@@ -58,5 +58,15 @@ export class GameSlave
 		buffer.limit(buffer.position + bytecount);
 		world.readFromBuffer(buffer);
 		buffer.removeLimit();
+	}
+
+	public render()
+	{
+		requestAnimationFrame(() => this.render());
+		for (let kvp of this.worlds)
+		{
+			let world = kvp[1];
+			world.update();
+		}
 	}
 }
