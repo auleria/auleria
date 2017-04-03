@@ -13,7 +13,7 @@
 		"class-name": true,
 		"semicolon": ["always"],
 		"triple-equals": true,
-		"only-arrow-functions": [true],
+		"only-arrow-functions": [false],
 		"prefer-for-of": true,
 		"variable-name": [true, "ban-keywords", "check-format", "allow-leading-underscore"],
 		"prefer-function-over-method": false,
