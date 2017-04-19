@@ -35,7 +35,6 @@ export abstract class GameObject
 
 	public writeToBuffer(bb : ByteBuffer, forced : boolean = false ) : boolean
 	{
-		console.log("How did we end up here?");
 		return false;
 	}
 
