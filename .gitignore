@@ -2,5 +2,11 @@
 bin/**/*.js
 bin/**/*.js.map
 
+# Tmp compilations
+bundle.js.tmp*
+
 # Node dependencies
 node_modules/
+
+# Debug logs
+npm-debug.log*
