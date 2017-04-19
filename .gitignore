@@ -1,6 +1,7 @@
 # Compiled stuff
 bin/**/*.js
 bin/**/*.js.map
+style/*.css
 
 # Tmp compilations
 bundle.js.tmp*
