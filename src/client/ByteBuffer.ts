@@ -12,7 +12,7 @@ enum types {
 
 export class ByteBuffer
 {
-	private arrayBuffer : ArrayBuffer;
+	private _arrayBuffer : ArrayBuffer;
 	private dataView : DataView;
 	private _position : number;
 	private limitPosition = Infinity;
@@ -20,18 +20,19 @@ export class ByteBuffer
 	private measurePointStart : number;
 
 	public get position() { return this._position; }
+	public get arrayBuffer() { return this._arrayBuffer; }
 
 	constructor(buffer : ArrayBuffer = null)
 	{
 		if (buffer !== null)
 		{
-			this.arrayBuffer = buffer;
+			this._arrayBuffer = buffer;
 		}
 		else
 		{
-			this.arrayBuffer = new ArrayBuffer(64000);
+			this._arrayBuffer = new ArrayBuffer(64000);
 		}
-		this.dataView = new DataView(this.arrayBuffer);
+		this.dataView = new DataView(this._arrayBuffer);
 		this._position = 0;
 	}
 
@@ -45,12 +46,12 @@ export class ByteBuffer
 	{
 		if (this._position + 16 > this.dataView.byteLength)
 		{
-			let newbuffer = new ArrayBuffer(this.arrayBuffer.byteLength * 2);
+			let newbuffer = new ArrayBuffer(this._arrayBuffer.byteLength * 2);
 			let uint8 = new Uint8Array(newbuffer);
 			uint8.set(new Uint8Array(this.dataView.buffer));
 
-			this.arrayBuffer = uint8.buffer;
-			this.dataView = new DataView(this.arrayBuffer);
+			this._arrayBuffer = uint8.buffer;
+			this.dataView = new DataView(this._arrayBuffer);
 		}
 
 		this._position += count;
@@ -64,12 +65,12 @@ export class ByteBuffer
 
 	public getTrimmedBuffer()
 	{
-		return this.arrayBuffer.slice(0, this._position);
+		return this._arrayBuffer.slice(0, this._position);
 	}
 
 	public gotData()
 	{
-		return this._position < Math.min(this.arrayBuffer.byteLength, this.limitPosition);
+		return this._position < Math.min(this._arrayBuffer.byteLength, this.limitPosition);
 	}
 
 	public limit(position : number)
@@ -175,14 +176,14 @@ export class ByteBuffer
 	{
 		let length = this.dataView.getUint16(this._position);
 		this._position += 2;
-		let sb = new Uint8Array(this.arrayBuffer, this._position, length);
+		let sb = new Uint8Array(this._arrayBuffer, this._position, length);
 		this._position += length;
 		return (new Buffer(sb)).toString("utf8");
 	}
 
 	public readId()
 	{
-		let array = new Uint8Array(this.arrayBuffer, this._position, Helper.ID_SIZE);
+		let array = new Uint8Array(this._arrayBuffer, this._position, Helper.ID_SIZE);
 		this._position += Helper.ID_SIZE;
 		return String.fromCharCode(...array);
 	}

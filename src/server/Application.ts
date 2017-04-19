@@ -36,6 +36,11 @@ app.get("/clients", (req, res) => {
 	res.send(Array.from(peers.keys()));
 });
 
+app.get("/bundle.js", (req, res) => {
+	console.log("asd");
+	res.sendFile(process.cwd() + "/bin/client/bundle.js");
+});
+
 server.listen(9080, () => {
 	console.log("Server is up and running on port", 9080);
 });

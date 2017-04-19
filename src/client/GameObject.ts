@@ -12,6 +12,7 @@ export abstract class GameObject
 	public get id() { return this._id; }
 	public get world() { return this._world; }
 	public get isMaster() { return this._world.isMaster; }
+	public get isOwner() { return this._world.isOwner; }
 
 	@Helper.sealed
 	public transform = new Transform();
@@ -28,14 +29,17 @@ export abstract class GameObject
 
 	public abstract update() : void
 
+	public abstract postUpdate() : void
+
 	public abstract destroy() : void
 
-	public writeToBuffer(bb : ByteBuffer)
+	public writeToBuffer(bb : ByteBuffer, forced : boolean = false ) : boolean
 	{
+		console.log("How did we end up here?");
 		return false;
 	}
 
-	public readFromBuffer(bb : ByteBuffer)
+	public readFromBuffer(bb : ByteBuffer, forced : boolean = false)
 	{
 		return;
 	}

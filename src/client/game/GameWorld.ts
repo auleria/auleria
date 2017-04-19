@@ -11,13 +11,22 @@ export abstract class GameWorld
 	private gameObjects = new Map<string, GameObject>();
 	private byteBuffer : ByteBuffer;
 	private _isMaster : boolean;
+	private _isOwner : boolean;
+	private _owner : string;
+	private _me : string;
 	public get isMaster() { return this._isMaster; }
+	public get isOwner() { return this._isOwner; }
 	public get id() { return this._id; }
+	public get owner() { return this._owner; }
+	public get me() { return this._me; }
 
-	constructor(id? : string, isMaster : boolean = true)
+	constructor(id? : string, owner : string = "", isOwner : boolean = true, isMaster : boolean = true, me : string = "noname")
 	{
 		this._id = id || Helper.generateID();
 		this._isMaster = isMaster;
+		this._isOwner = isOwner;
+		this._owner = owner;
+		this._me = me;
 	}
 
 	public abstract initialize() : void
@@ -40,6 +49,15 @@ export abstract class GameWorld
 		}
 	}
 
+	public postUpdate()
+	{
+		for (let kvp of this.gameObjects)
+		{
+			let object = kvp[1];
+			object.postUpdate();
+		}
+	}
+
 	public add<T extends GameObject>(object : T) : T
 	{
 		object.preInitialize(this);
@@ -50,7 +68,7 @@ export abstract class GameWorld
 			this.byteBuffer.writeByte(NetworkCode.CREATE_OBJECT);
 			this.byteBuffer.writeString(object.constructor.name);
 			this.byteBuffer.writeId(object.id);
-			this.writeObjectData(object);
+			this.writeObjectData(object, true);
 			object.initialize();
 			this.byteBuffer.writeByte(NetworkCode.OBJECT_INITIALIZATION);
 			this.byteBuffer.writeId(object.id);
@@ -68,9 +86,26 @@ export abstract class GameWorld
 		this.byteBuffer = buffer;
 	}
 
+	public getBuffer()
+	{
+		return this.byteBuffer;
+	}
+
 	public writeToBuffer()
 	{
 		this.writeUpdateData();
+	}
+
+	public writeCreationData(buffer : ByteBuffer)
+	{
+		this.gameObjects.forEach((object, id) => {
+			buffer.writeByte(NetworkCode.CREATE_OBJECT);
+			this.byteBuffer.writeString(object.constructor.name);
+			this.byteBuffer.writeId(object.id);
+			this.writeObjectData(object, true);
+			this.byteBuffer.writeByte(NetworkCode.OBJECT_INITIALIZATION);
+			this.byteBuffer.writeId(object.id);
+		});
 	}
 
 	public readFromBuffer(buffer : ByteBuffer)
@@ -106,8 +141,9 @@ export abstract class GameWorld
 	private readObjectData(buffer : ByteBuffer)
 	{
 		let id = buffer.readId();
+		let forced = buffer.readByte() === 1 ? true : false;
 		let object = this.gameObjects.get(id);
-		object.readFromBuffer(buffer);
+		object.readFromBuffer(buffer, forced);
 	}
 
 	private initializeObjectFromBuffer(buffer : ByteBuffer)
@@ -121,20 +157,21 @@ export abstract class GameWorld
 		for (let kvp of this.gameObjects)
 		{
 			let object = kvp[1];
-			this.writeObjectData(object);
+			this.writeObjectData(object, false);
 		}
 	}
 
-	private writeObjectData(object : GameObject)
+	private writeObjectData(object : GameObject, forced : boolean)
 	{
 		let prevPos = this.byteBuffer.position;
-		this.byteBuffer.seek(prevPos + 1 + Helper.ID_SIZE);
-		if ( object.writeToBuffer(this.byteBuffer) )
+		this.byteBuffer.seek(prevPos + 1 + Helper.ID_SIZE + 1);
+		if ( object.writeToBuffer(this.byteBuffer, forced) )
 		{
 			let curPos = this.byteBuffer.position;
 			this.byteBuffer.seek(prevPos);
 			this.byteBuffer.writeByte(NetworkCode.OBJECT_DATA);
 			this.byteBuffer.writeId(object.id);
+			this.byteBuffer.writeByte(forced ? 1 : 0);
 			this.byteBuffer.seek(curPos);
 
 			return true;
@@ -149,7 +186,7 @@ export abstract class GameWorld
 		let typename = buffer.readString();
 		let id = buffer.readId();
 		let type = Classes.getClass(typename);
-		let object = new type(this) as GameObject;
+		let object = new type() as GameObject;
 		object.preInitialize(this, id);
 		this.gameObjects.set(id, object);
 	}

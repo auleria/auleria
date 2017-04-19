@@ -7,8 +7,11 @@ import { Classes } from "../../Classes";
 export class DebugObject extends GameObject
 {
 	public name : string;
+	private changedName = false;
 	private text : HTMLDivElement;
 	private x : number;
+
+	private over : boolean;
 
 	constructor(name : string = "Hankerino")
 	{
@@ -19,7 +22,7 @@ export class DebugObject extends GameObject
 	public initialize(): void {
 		if (this.isMaster)
 		{
-			this.x = Math.random();
+			this.x = Math.random() * Math.PI * 2;
 		}
 		else
 		{
@@ -27,20 +30,59 @@ export class DebugObject extends GameObject
 			this.text.innerHTML = this.name;
 			this.text.style.width = "200px";
 			document.body.appendChild(this.text);
+
+			this.text.onmouseover = () => {
+				this.name = this.world.me;
+				this.changedName = true;
+			};
 		}
 	}
 
-	public writeToBuffer(buffer : ByteBuffer)
+	public writeToBuffer(buffer : ByteBuffer, forced : boolean)
 	{
-		buffer.writeString(this.name);
-		buffer.writeFloat(this.x);
-		return true;
+		if (this.isMaster || forced)
+		{
+			if (forced || this.changedName)
+			{
+				buffer.writeByte(1);
+				buffer.writeString(this.name);
+				this.changedName = false;
+			}
+			else
+			{
+				buffer.writeByte(0);
+			}
+
+			buffer.writeFloat(this.x);
+			return true;
+		}
+		else
+		{
+			if (this.changedName)
+			{
+				buffer.writeString(this.name);
+				return true;
+			}
+			return false;
+		}
 	}
 
-	public readFromBuffer(buffer : ByteBuffer)
+	public readFromBuffer(buffer : ByteBuffer, forced : boolean = false)
 	{
-		this.name = buffer.readString();
-		this.x = buffer.readFloat();
+		if (!this.isMaster)
+		{
+			let namechange = buffer.readByte() === 1;
+			if (forced || namechange)
+			{
+				this.name = buffer.readString();
+			}
+			this.x = buffer.readFloat();
+		}
+		else
+		{
+			this.name = buffer.readString();
+			this.changedName = true;
+		}
 	}
 
 	public tick(): void {
@@ -49,6 +91,16 @@ export class DebugObject extends GameObject
 
 	public update(): void {
 		this.text.style.transform = "translateX(" + (Math.sin(this.x) * 10) + "px)";
+		this.text.style.background = this.over ? "red" : "transparent";
+		this.text.innerHTML = this.name;
+	}
+
+	public postUpdate() : void
+	{
+		if (this.changedName)
+		{
+			this.changedName = false;
+		}
 	}
 
 	public destroy(): void {
