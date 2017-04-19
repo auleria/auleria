@@ -7,6 +7,8 @@ import { IMessage } from "./IMessage";
 import { ByteBuffer } from "./ByteBuffer";
 import { Classes } from "./Classes";
 import { NetworkHub } from "./NetworkHub";
+import { Tween } from "./Tween";
+import { Commands } from "./Commands";
 
 declare let Peer: any;
 
@@ -22,8 +24,19 @@ export class GameManager
 	private peerWorlds = new Map<string, {id :string, type:string}[]>();
 	private hub = new NetworkHub();
 
+	private mainRenderer : THREE.WebGLRenderer;
+	private subRenderers = new Map<string, THREE.WebGLRenderTarget>();
+
+	public get canvas() { return this.mainRenderer.domElement; }
+
 	constructor()
 	{
+		this.mainRenderer = new THREE.WebGLRenderer({antialias: true});
+		this.mainRenderer.setSize(window.innerWidth, window.innerHeight);
+		window.addEventListener("resize", () => {
+			this.mainRenderer.setSize(window.innerWidth, window.innerHeight);
+			(this.mainRenderer as any).needsUpdate = true;
+		});
 		this.setupHub();
 		this.update();
 	}
@@ -41,15 +54,29 @@ export class GameManager
 		//Tell the worker who we are
 		workerInterface.post("set me", this.peer.id);
 
-		//Tell the worker to create a new world with the same type and id as the world we just created
-		workerInterface.post("create world", {worldId: world.id, worldType: world.constructor.name});
-
 		this.hub.addInterface(workerInterface);
 		//Add both the world and the worker to the maps, using the world id as key for both
 		this.networkInterfaces.set(world.id, workerInterface);
 		this.worlds.set(world.id, world);
 
+		//Tell the worker to create a new world with the same type and id as the world we just created
+		let worlddata = await workerInterface.request("create world", {worldId: world.id, worldType: world.constructor.name});
+		world.readFromBuffer(new ByteBuffer(worlddata.buffer));
+		world.initialize();
+		world.isInitialized = true;
+
+		Commands.register("tickrate", (tickrate : any) => {
+			workerInterface.post("set tickrate", tickrate);
+			Tween.tickrate = 60 / tickrate;
+		});
+
 		return world;
+	}
+
+	public setMainWorld(world : GameWorld)
+	{
+		world.setRenderer(this.mainRenderer);
+		world.setAspect(window.innerWidth / window.innerHeight);
 	}
 
 	public setupHub()
@@ -127,68 +154,18 @@ export class GameManager
 			let world = new worldType(id, worlddata.owner, false, false, this.peer.id) as GameWorld;
 			world.readFromBuffer(new ByteBuffer(worlddata.buffer));
 			world.initialize();
+			world.isInitialized = true;
 			this.worlds.set(world.id, world);
 			this.networkInterfaces.set(world.id, peer);
 			resolve(world);
 		});
 	}
 
-	public handleMessage(message : any, connection? : any)
-	{
-		//What world is this message aimed at?
-		let id = message.worldId;
-		let world = this.worlds.get(id);
-
-		//What kind of data is this?
-		switch (message.messagetype)
-		{
-			case "worlddata":
-				//If it is world data we want the world to handle it
-				world.readFromBuffer(new ByteBuffer(message.buffer));
-				if (world.isOwner) {
-					this.peers.forEach((peer, id) => {
-						if (peer.isReady)
-						{
-							// peer.connection.send(message);
-						}
-					});
-				}
-				break;
-			case "clientworlddata":
-				//If it is world data we want the world to handle it
-				this.worldWorkers.get(world.id).postMessage({messagetype: "worlddata", worldId: world.id, buffer: message.buffer}, [message.buffer]);
-				break;
-			case "getworldcreationdata":
-				//A new world needs all the creationdata for it's current objects
-				let tmpBuffer = world.getBuffer();
-				let buffer = new ByteBuffer();
-				this.worlds.get(id).setBuffer(buffer);
-				this.worlds.get(id).writeCreationData(buffer);
-				this.worlds.get(id).setBuffer(tmpBuffer);
-				connection.send({messagetype: "worlddata", worldId: id, buffer: buffer.getTrimmedBuffer()});
-				this.peers.get(connection.peer).isReady = true;
-				break;
-			case "updateremoteworldlist":
-				//What worlds are hosted on the remote computer?
-				this.updateRemoteWorldList(connection, message);
-				break;
-			case "gethostedworlds":
-				//What worlds are hosted on this computer?
-				connection.send({
-					messagetype: "updateremoteworldlist",
-					worlds: Array.from(this.worldWorkers.keys()).map(id => ({id: id, type: this.worlds.get(id).constructor.name}))
-				});
-				break;
-			default:
-				console.warn("unknown messagetype", message);
-				break;
-		}
-	}
-
 	private update()
 	{
 		requestAnimationFrame(() => this.update());
 
+		Tween.update();
 		this.worlds.forEach(world => {
 			let buffer = new ByteBuffer();
 			world.setBuffer(buffer);
@@ -208,7 +185,10 @@ export class GameManager
 					this.networkInterfaces.get(world.id).post("world data passthrough", {id: world.id, buffer: trimmed}, [trimmed]);
 				}
 			}
+
+			world.render();
 		});
+
 	}
 
 	private updateRemoteWorldList(connection : any, message : any)

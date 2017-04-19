@@ -12,7 +12,10 @@ export class GameWorker
 	private world : GameWorld;
 	private buffer = new ByteBuffer();
 	private me : string;
+	private interval : NodeJS.Timer;
 
+	public static TICKRATE = 20;
+	public static TICKRATE_CHANGED = false;
 
 	private networkInterface : NetworkInterface;
 
@@ -22,7 +25,16 @@ export class GameWorker
 		this.networkInterface = new NetworkInterface(self as any);
 
 		this.networkInterface.on("set me", me => this.me = me);
-		this.networkInterface.on("create world", data => this.createWorld(Classes.getClass(data.worldType), data.worldId));
+		this.networkInterface.on("create world", (data, answer) => {
+			this.createWorld(Classes.getClass(data.worldType), data.worldId);
+			let trimmed = this.buffer.getTrimmedBuffer();
+			this.buffer = new ByteBuffer();
+			console.log("sending buffer to client");
+
+			this.interval = setInterval(() => this.tick(), 1000 / GameWorker.TICKRATE);
+
+			answer({buffer: trimmed}, [trimmed]);
+		});
 		this.networkInterface.on("get world data", (data, answer) => {
 			let tmpBuffer = this.world.getBuffer();
 			let buffer = new ByteBuffer();
@@ -34,6 +46,14 @@ export class GameWorker
 		});
 		this.networkInterface.on("world data", data => {
 			this.world.readFromBuffer(new ByteBuffer(data.buffer));
+		});
+		this.networkInterface.on("get tickrate", (data, answer) => {
+			answer(GameWorker.TICKRATE);
+		});
+		this.networkInterface.on("set tickrate", tickrate => {
+			GameWorker.TICKRATE = tickrate;
+			clearInterval(this.interval);
+			this.interval = setInterval(() => this.tick(), 1000 / GameWorker.TICKRATE);
 		});
 	}
 
@@ -72,7 +92,6 @@ export class GameWorker
 		this.world = world;
 		world.setBuffer(this.buffer);
 		world.initialize();
-		setInterval(() => this.tick(), 17);
 	}
 
 	private tick()
@@ -80,7 +99,7 @@ export class GameWorker
 		if (this.world)
 		{
 			this.world.setBuffer(this.buffer);
-			this.world.tick();
+			this.world.tick(1 / GameWorker.TICKRATE);
 			this.world.writeToBuffer();
 			this.sendBuffer();
 		}

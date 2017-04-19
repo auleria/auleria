@@ -1,6 +1,8 @@
 import { Helper } from "./Helper";
 import { GameManager } from "./GameManager";
 import { GameWorker } from "./GameWorker";
+import { Tween } from "./Tween";
+import { Commands } from "./Commands";
 
 declare let Peer : any;
 
@@ -17,6 +19,7 @@ async function main()
 	}
 	else
 	{
+
 		let id = getHashParameter("id");
 		let host = getHashParameter("host");
 
@@ -28,10 +31,16 @@ async function main()
 			let remote = await gameManager.connectToRemote(host);
 			let worlds = (await remote.request("worlds")).worlds;
 			let world = await gameManager.openWorld(remote, worlds[0]);
+
+			gameManager.setMainWorld(world);
+			document.body.appendChild(gameManager.canvas);
 		}
 		else
 		{
-			gameManager.createWorld();
+			let world = await gameManager.createWorld();
+			gameManager.setMainWorld(world);
+
+			document.body.appendChild(gameManager.canvas);
 		}
 	}
 }

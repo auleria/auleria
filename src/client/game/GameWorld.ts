@@ -5,20 +5,30 @@ import { ByteBuffer } from "../ByteBuffer";
 import { NetworkCode } from "../NetworkCode";
 import { Classes } from "../Classes";
 
+const FOV = 90;
+
 export abstract class GameWorld
 {
 	private _id : string;
-	private gameObjects = new Map<string, GameObject>();
 	private byteBuffer : ByteBuffer;
 	private _isMaster : boolean;
 	private _isOwner : boolean;
 	private _owner : string;
 	private _me : string;
+
+	public isInitialized : boolean;
+
+	private gameObjects = new Map<string, GameObject>();
+	private _scene : THREE.Scene;
+	protected mainCamera : THREE.PerspectiveCamera;
+	private renderer : THREE.Renderer;
+
 	public get isMaster() { return this._isMaster; }
 	public get isOwner() { return this._isOwner; }
 	public get id() { return this._id; }
 	public get owner() { return this._owner; }
 	public get me() { return this._me; }
+	public get scene() { return this._scene; }
 
 	constructor(id? : string, owner : string = "", isOwner : boolean = true, isMaster : boolean = true, me : string = "noname")
 	{
@@ -27,16 +37,22 @@ export abstract class GameWorld
 		this._isOwner = isOwner;
 		this._owner = owner;
 		this._me = me;
+
+		if (!isMaster)
+		{
+			this._scene = new THREE.Scene();
+			this.mainCamera = new THREE.PerspectiveCamera(FOV, 1, 0.1, 1000);
+		}
 	}
 
 	public abstract initialize() : void
 
-	public tick()
+	public tick(timescale : number)
 	{
 		for (let kvp of this.gameObjects)
 		{
 			let object = kvp[1];
-			object.tick();
+			object.tick(timescale);
 		}
 	}
 
@@ -58,6 +74,19 @@ export abstract class GameWorld
 		}
 	}
 
+	public render()
+	{
+		if (this.renderer && this.scene && this.mainCamera)
+		{
+			if ((this.renderer as any).needsUpdate)
+			{
+				(this.renderer as any).needsUpdate = false;
+				this.setAspect(window.innerWidth / window.innerHeight);
+			}
+			this.renderer.render(this.scene, this.mainCamera);
+		}
+	}
+
 	public add<T extends GameObject>(object : T) : T
 	{
 		object.preInitialize(this);
@@ -70,6 +99,7 @@ export abstract class GameWorld
 			this.byteBuffer.writeId(object.id);
 			this.writeObjectData(object, true);
 			object.initialize();
+			this.writeObjectData(object, true);
 			this.byteBuffer.writeByte(NetworkCode.OBJECT_INITIALIZATION);
 			this.byteBuffer.writeId(object.id);
 		}
@@ -79,6 +109,17 @@ export abstract class GameWorld
 		}
 
 		return object;
+	}
+
+	public setRenderer(renderer : THREE.Renderer)
+	{
+		this.renderer = renderer;
+	}
+
+	public setAspect(aspect : number)
+	{
+		this.mainCamera.aspect = aspect;
+		this.mainCamera.updateProjectionMatrix();
 	}
 
 	public setBuffer(buffer : ByteBuffer)

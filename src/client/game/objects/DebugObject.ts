@@ -2,6 +2,7 @@ import { Remote } from "../../Remote";
 import { GameObject } from "../../GameObject";
 import { ByteBuffer } from "../../ByteBuffer";
 import { Classes } from "../../Classes";
+import { Tween } from "../../Tween";
 
 @Classes.register
 export class DebugObject extends GameObject
@@ -9,9 +10,11 @@ export class DebugObject extends GameObject
 	public name : string;
 	private changedName = false;
 	private text : HTMLDivElement;
-	private x : number;
 
-	private over : boolean;
+	private x = 0;
+	private y = 0;
+
+	private boxMesh : THREE.Mesh;
 
 	constructor(name : string = "Hankerino")
 	{
@@ -23,47 +26,29 @@ export class DebugObject extends GameObject
 		if (this.isMaster)
 		{
 			this.x = Math.random() * Math.PI * 2;
+			// this.y = Math.random() * Math.PI * 2;
 		}
 		else
 		{
-			this.text = document.createElement("div");
-			this.text.innerHTML = this.name;
-			this.text.style.width = "200px";
-			document.body.appendChild(this.text);
+			Tween.simple(this, "x");
 
-			this.text.onmouseover = () => {
-				this.name = this.world.me;
-				this.changedName = true;
-			};
+			let geometry = new THREE.BoxGeometry(0.1, 0.1, 0.1);
+			this.boxMesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({color: 0xffffff}));
+
+			this.boxMesh.position.y = this.y;
+			this.world.scene.add(this.boxMesh);
 		}
 	}
 
 	public writeToBuffer(buffer : ByteBuffer, forced : boolean)
 	{
-		if (this.isMaster || forced)
+		if (this.isMaster)
 		{
-			if (forced || this.changedName)
-			{
-				buffer.writeByte(1);
-				buffer.writeString(this.name);
-				this.changedName = false;
+			if (forced) {
+				buffer.writeFloat(this.y);
 			}
-			else
-			{
-				buffer.writeByte(0);
-			}
-
-			buffer.writeFloat(this.x);
+			buffer.writeFloat(Math.sin(this.x));
 			return true;
-		}
-		else
-		{
-			if (this.changedName)
-			{
-				buffer.writeString(this.name);
-				return true;
-			}
-			return false;
 		}
 	}
 
@@ -71,39 +56,22 @@ export class DebugObject extends GameObject
 	{
 		if (!this.isMaster)
 		{
-			let namechange = buffer.readByte() === 1;
-			if (forced || namechange)
-			{
-				this.name = buffer.readString();
+			if (forced) {
+				this.y = buffer.readFloat();
 			}
 			this.x = buffer.readFloat();
 		}
-		else
-		{
-			this.name = buffer.readString();
-			this.changedName = true;
-		}
 	}
 
-	public tick(): void {
-		this.x += 0.1;
+	public tick(timescale : number): void {
+		this.x += Math.PI * timescale;
 	}
 
 	public update(): void {
-		this.text.style.transform = "translateX(" + (Math.sin(this.x) * 10) + "px)";
-		this.text.style.background = this.over ? "red" : "transparent";
-		this.text.innerHTML = this.name;
-	}
-
-	public postUpdate() : void
-	{
-		if (this.changedName)
-		{
-			this.changedName = false;
-		}
+		this.boxMesh.position.x = this.x;
 	}
 
 	public destroy(): void {
-		throw new Error('Method not implemented.');
+		this.world.scene.remove(this.boxMesh);
 	}
 }

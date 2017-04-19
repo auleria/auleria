@@ -12,7 +12,7 @@ export class DebugWorld extends GameWorld
 		if (this.isMaster)
 		{
 			console.log("Debug World created, id is", this.id, "me is", this.me);
-			for (let i = 0; i < 20; i++)
+			for (let i = 0; i < 1; i++)
 			{
 				this.add(new DebugObject(i.toString()));
 			}
@@ -20,6 +20,8 @@ export class DebugWorld extends GameWorld
 		else
 		{
 			console.log("DebugWorld created on client with id", this.id);
+
+			this.mainCamera.position.z = 2;
 		}
 	}
 }

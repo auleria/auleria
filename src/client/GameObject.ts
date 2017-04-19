@@ -25,11 +25,11 @@ export abstract class GameObject
 
 	public abstract initialize() : void
 
-	public abstract tick() : void
+	public tick(timescale?: number) : void { }
 
-	public abstract update() : void
+	public update() : void { }
 
-	public abstract postUpdate() : void
+	public postUpdate() : void { }
 
 	public abstract destroy() : void
 
