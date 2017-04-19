@@ -227,7 +227,7 @@ export abstract class GameWorld
 		let typename = buffer.readString();
 		let id = buffer.readId();
 		let type = Classes.getClass(typename);
-		let object = new type() as GameObject;
+		let object = this.gameObjects.get(id) || new type() as GameObject;
 		object.preInitialize(this, id);
 		this.gameObjects.set(id, object);
 	}
