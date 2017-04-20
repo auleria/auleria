@@ -30,10 +30,16 @@ async function main()
 		{
 			let remote = await gameManager.connectToRemote(host);
 			let worlds = (await remote.request("worlds")).worlds;
-			let world = await gameManager.openWorld(remote, worlds[0]);
-
-			gameManager.setMainWorld(world);
-			document.body.appendChild(gameManager.canvas);
+			try
+			{
+				let world = await gameManager.openWorld(remote, worlds[0]);
+				gameManager.setMainWorld(world);
+				document.body.appendChild(gameManager.canvas);
+			}
+			catch(e)
+			{
+				alert("No no, this world is not for you");
+			}
 		}
 		else
 		{
