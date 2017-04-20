@@ -8,11 +8,14 @@ export abstract class GameObject
 {
 	private _id = Helper.generateID();
 	private _world : GameWorld;
+	private _isInitialized : boolean;
+	private isDestroyed = false;
 
 	public get id() { return this._id; }
 	public get world() { return this._world; }
 	public get isMaster() { return this._world.isMaster; }
 	public get isOwner() { return this._world.isOwner; }
+	public get isInitialized() { return this._isInitialized; }
 
 	@Helper.sealed
 	public transform = new Transform();
@@ -25,13 +28,19 @@ export abstract class GameObject
 
 	public abstract initialize() : void
 
+	public externalInitialize() : void
+	{
+		this.initialize();
+		this._isInitialized = true;
+	}
+
 	public tick(timescale?: number) : void { }
 
 	public update() : void { }
 
 	public postUpdate() : void { }
 
-	public abstract destroy() : void
+	public abstract onDestroy() : void
 
 	public writeToBuffer(bb : ByteBuffer, forced : boolean = false ) : boolean
 	{
