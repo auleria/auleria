@@ -1,5 +1,4 @@
-import { Remote } from "../../Remote";
-import { GameObject } from "../../GameObject";
+import { GameObject } from "../GameObject";
 import { ByteBuffer } from "../../ByteBuffer";
 import { Classes } from "../../Classes";
 import { Tween } from "../../Tween";

@@ -1,6 +1,5 @@
-import { GameObject, IGameObjectData } from "../GameObject";
+import { GameObject } from "./GameObject";
 import { Helper } from "../Helper";
-import { Remote } from "../Remote";
 import { ByteBuffer } from "../ByteBuffer";
 import { NetworkCode } from "../NetworkCode";
 import { Classes } from "../Classes";

@@ -1,8 +1,7 @@
-import { Remote, IPropertyPair } from "./Remote";
-import { Helper } from "./Helper";
-import { GameWorld } from "./game/GameWorld";
-import { Transform } from "./game/Transform";
-import { ByteBuffer } from "./ByteBuffer";
+import { Helper } from "../Helper";
+import { GameWorld } from "./GameWorld";
+import { Transform } from "./Transform";
+import { ByteBuffer } from "../ByteBuffer";
 
 export abstract class GameObject
 {
@@ -51,11 +50,4 @@ export abstract class GameObject
 	{
 		return;
 	}
-}
-
-export interface IGameObjectData
-{
-	id : string;
-	type : string;
-	properties : IPropertyPair[];
 }
