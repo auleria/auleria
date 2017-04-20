@@ -28,4 +28,9 @@ export class NetworkHub
 		this.interfaces.push(networkInterface);
 		networkInterface.addHub(this);
 	}
+
+	public removeInterface(networkInterface : NetworkInterface)
+	{
+		this.interfaces.splice(this.interfaces.findIndex(ni => ni === networkInterface), 1);
+	}
 }
