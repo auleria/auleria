@@ -63,6 +63,11 @@ export class GameManager
 		let worlddata = await workerInterface.request("create world", {worldId: world.id, worldType: world.constructor.name});
 		world.readFromBuffer(new ByteBuffer(worlddata.buffer));
 		world.initialize();
+		let trimmed = world.getBuffer().getTrimmedBuffer();
+		if (trimmed.byteLength > 0) {
+			workerInterface.post("world data", {buffer: trimmed}, [trimmed]);
+			world.setBuffer(new ByteBuffer());
+		}
 		world.isInitialized = true;
 
 		Commands.register("tickrate", (tickrate : any) => {
@@ -89,7 +94,9 @@ export class GameManager
 
 				if (world.isOwner)
 				{
-					this.peers.forEach(peer => peer.networkInterface.post("world data", data));
+					if (data.buffer.byteLength > 0) {
+						this.peers.forEach(peer => peer.networkInterface.post("world data", data));
+					}
 				}
 			}
 		});
@@ -104,7 +111,6 @@ export class GameManager
 
 		this.hub.on("worlds", (data, sender, answer) => {
 			let worlds = Array.from(this.worlds.keys());
-			console.log(worlds);
 			answer({worlds: worlds});
 		});
 
@@ -117,8 +123,20 @@ export class GameManager
 			answer("hello");
 		});
 
+		this.hub.on("join world", async (worldID, sender, answer) => {
+			let world = this.worlds.get(worldID);
+			if (world && world.isOwner)
+			{
+				let worldInterface = this.networkInterfaces.get(worldID);
+				answer(await worldInterface.request("join", {id: sender.peerID}));
+			}
+			else
+			{
+				answer(false);
+			}
+		});
+
 		this.hub.on("full world sync", async (worldID, sender, answer) => {
-			console.log("someone requested a full world sync");
 			let world = this.worlds.get(worldID);
 			let worldInterface = this.networkInterfaces.get(worldID);
 			let worldBuffer = (await worldInterface.request("get world data")).buffer;
@@ -126,8 +144,17 @@ export class GameManager
 				id : world.id,
 				type: world.constructor.name,
 				owner: this.peer.id,
-				buffer: worldBuffer
+				buffer: worldBuffer.byteLength > 0 ? worldBuffer : new ArrayBuffer(1)
 			}, [worldBuffer]);
+		});
+
+		this.hub.on("disconnect", (data, sender) => {
+			this.worlds.forEach((world, id) => {
+				if (world.isOwner)
+				{
+					this.networkInterfaces.get(id).post("leave", {id: sender.peerID});
+				}
+			});
 		});
 	}
 
@@ -148,16 +175,29 @@ export class GameManager
 	public async openWorld(peer : NetworkInterface, id : string)
 	{
 		return new Promise<GameWorld>(async (resolve, reject) => {
-			console.log("requesting full sync of world", id);
-			let worlddata = await peer.request("full world sync", id);
-			let worldType = Classes.getClass(worlddata.type);
-			let world = new worldType(id, worlddata.owner, false, false, this.peer.id) as GameWorld;
-			world.readFromBuffer(new ByteBuffer(worlddata.buffer));
-			world.initialize();
-			world.isInitialized = true;
-			this.worlds.set(world.id, world);
-			this.networkInterfaces.set(world.id, peer);
-			resolve(world);
+			let allowed = await peer.request("join world", id);
+			if (allowed)
+			{
+				let worlddata = await peer.request("full world sync", id);
+				let worldType = Classes.getClass(worlddata.type);
+				let world = new worldType(id, worlddata.owner, false, false, this.peer.id) as GameWorld;
+				world.setBuffer(new ByteBuffer());
+				world.readFromBuffer(new ByteBuffer(worlddata.buffer));
+				world.initialize();
+				let trimmed = world.getBuffer().getTrimmedBuffer();
+				if (trimmed.byteLength > 0) {
+					peer.post("world data passthrough", {buffer: trimmed, id: world.id}, [trimmed]);
+				}
+				world.isInitialized = true;
+				this.worlds.set(world.id, world);
+				this.networkInterfaces.set(world.id, peer);
+				resolve(world);
+			}
+			else
+			{
+				reject("You may not join this world.");
+			}
+
 		});
 	}
 
@@ -167,16 +207,17 @@ export class GameManager
 
 		Tween.update();
 		this.worlds.forEach(world => {
-			let buffer = new ByteBuffer();
-			world.setBuffer(buffer);
 			world.update();
 			world.writeToBuffer();
 			world.postUpdate();
-			let trimmed = buffer.getTrimmedBuffer();
+
+			let trimmed = world.getBuffer().getTrimmedBuffer();
 
 			if (world.isOwner)
 			{
-				this.networkInterfaces.get(world.id).post("world data", {worldId: world.id, buffer: trimmed}, [trimmed]);
+				if (trimmed.byteLength > 0) {
+					this.networkInterfaces.get(world.id).post("world data", {worldId: world.id, buffer: trimmed}, [trimmed]);
+				}
 			}
 			else
 			{
@@ -186,6 +227,7 @@ export class GameManager
 				}
 			}
 
+			world.setBuffer(new ByteBuffer());
 			world.render();
 		});
 
