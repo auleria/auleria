@@ -10,7 +10,6 @@ export class Tween
 	{
 		if (Tween.enabled)
 		{
-			console.log("Setting tween.simple for", property, "on", target);
 			let prop = {
 				realValue: 0,
 				value: 0,
