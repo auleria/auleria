@@ -14,6 +14,9 @@ export class Classes
 			let constructor = Classes.classes.get(name);
 			return constructor;
 		}
-		return null;
+		else
+		{
+			throw new Error(name + " is not in the class register, did you forget to do @Classes.register?");
+		}
 	}
 }
