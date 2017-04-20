@@ -26,7 +26,17 @@ export class NetworkInterface
 		{
 			adapter.on("data", (data : any) => this.handleMessage(data));
 			this.connection = adapter;
+
+			adapter.on("close", () => {
+				this.handleMessage({__event: "disconnect"});
+				this.destroy();
+			});
 		}
+	}
+
+	public destroy()
+	{
+		this.hubs.forEach(hub => hub.removeInterface(this));
 	}
 
 	public post(eventName : string, data? : any, transferable : any[] = new Array())
@@ -71,7 +81,7 @@ export class NetworkInterface
 		{
 			let resolve = this.inTransit.get(messageID);
 			this.inTransit.delete(messageID);
-			return resolve(message);
+			return resolve(typeof message.__value === "undefined" ? message : message.__value);
 		}
 		else
 		{
