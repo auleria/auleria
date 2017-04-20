@@ -29,17 +29,17 @@ export class GameWorker
 			this.createWorld(Classes.getClass(data.worldType), data.worldId);
 			let trimmed = this.buffer.getTrimmedBuffer();
 			this.buffer = new ByteBuffer();
+			this.world.setBuffer(this.buffer);
 			console.log("sending buffer to client");
 
-			this.interval = setInterval(() => this.tick(), 1000 / GameWorker.TICKRATE);
-
 			answer({buffer: trimmed}, [trimmed]);
+			this.interval = setInterval(() => this.tick(), 1000 / GameWorker.TICKRATE);
 		});
 		this.networkInterface.on("get world data", (data, answer) => {
 			let tmpBuffer = this.world.getBuffer();
 			let buffer = new ByteBuffer();
 			this.world.setBuffer(buffer);
-			this.world.writeCreationData(buffer);
+			this.world.writeCreationData();
 			this.world.setBuffer(tmpBuffer);
 			let trimmed = buffer.getTrimmedBuffer();
 			answer({buffer: trimmed}, [trimmed]);
@@ -55,43 +55,22 @@ export class GameWorker
 			clearInterval(this.interval);
 			this.interval = setInterval(() => this.tick(), 1000 / GameWorker.TICKRATE);
 		});
-	}
-
-	private handleMessage(event:MessageEvent)
-	{
-		let message = event.data;
-		switch (message.messagetype)
-		{
-			case "setme":
-				this.me = message.me;
-				console.log(this.me);
-				break;
-			case "createWorld":
-				console.log("About to create a new world of type", message.data.worldType);
-				this.createWorld(Classes.getClass(message.data.worldType), message.worldId);
-				break;
-			case "worlddata":
-				this.world.readFromBuffer(new ByteBuffer(message.buffer));
-				break;
-			case "fullsync":
-				let tmpBuffer = this.world.getBuffer();
-				let buffer = new ByteBuffer();
-				this.world.setBuffer(buffer);
-				this.world.writeCreationData(buffer);
-				this.world.setBuffer(tmpBuffer);
-				let trimmed = buffer.getTrimmedBuffer();
-				break;
-			default:
-			console.warn("Got unknown event", message);
-		}
+		this.networkInterface.on("join", (user, answer) => {
+			this.world.triggerEvent("join", user.id, {});
+			answer(true);
+		});
+		this.networkInterface.on("leave", (user, answer) => {
+			this.world.triggerEvent("left", user.id, {});
+		});
 	}
 
 	private createWorld(worldType : any, id : string)
 	{
 		let world = new worldType(id, this.me, true, true, this.me) as GameWorld;
-		this.world = world;
 		world.setBuffer(this.buffer);
 		world.initialize();
+		world.triggerEvent("join", this.me, {});
+		this.world = world;
 	}
 
 	private tick()
@@ -102,6 +81,7 @@ export class GameWorker
 			this.world.tick(1 / GameWorker.TICKRATE);
 			this.world.writeToBuffer();
 			this.sendBuffer();
+			this.world.setBuffer(this.buffer);
 		}
 	}
 
