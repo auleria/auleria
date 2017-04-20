@@ -3,11 +3,12 @@ import { GameObject } from "../../GameObject";
 import { ByteBuffer } from "../../ByteBuffer";
 import { Classes } from "../../Classes";
 import { Tween } from "../../Tween";
+import { DebugWorld } from "../worlds/DebugWorld";
 
 @Classes.register
 export class DebugObject extends GameObject
 {
-	public name : string;
+	public playerID : string;
 	private changedName = false;
 	private text : HTMLDivElement;
 
@@ -19,14 +20,16 @@ export class DebugObject extends GameObject
 	constructor(name : string = "Hankerino")
 	{
 		super();
-		this.name = name;
+		this.playerID = name;
 	}
 
 	public initialize(): void {
+
 		if (this.isMaster)
 		{
+			console.log("created debug object with name", this.playerID);
 			this.x = Math.random() * Math.PI * 2;
-			// this.y = Math.random() * Math.PI * 2;
+			this.y = Math.random() * Math.PI * 2;
 		}
 		else
 		{
@@ -38,6 +41,9 @@ export class DebugObject extends GameObject
 			this.boxMesh.position.y = this.y;
 			this.world.scene.add(this.boxMesh);
 		}
+
+		let dworld = this.world as DebugWorld;
+		dworld.players.set(this.playerID, this);
 	}
 
 	public writeToBuffer(buffer : ByteBuffer, forced : boolean)
@@ -71,7 +77,10 @@ export class DebugObject extends GameObject
 		this.boxMesh.position.x = this.x;
 	}
 
-	public destroy(): void {
-		this.world.scene.remove(this.boxMesh);
+	public onDestroy(): void {
+		if (!this.isMaster)
+		{
+			this.world.scene.remove(this.boxMesh);
+		}
 	}
 }
