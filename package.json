@@ -52,11 +52,8 @@
     "npm-run-all": "^4.0.2",
     "peer": "^0.2.8",
     "rand-token": "^0.3.0",
-<<<<<<< HEAD
     "simplex-noise": "^2.3.0",
-=======
     "stats.js": "^0.17.0",
->>>>>>> 8ccfb865e3dba0063e4b2dc87ca9f02843143a8b
     "three": "^0.84.0",
     "tsify": "^3.0.1",
     "tslint": "^4.5.1",
