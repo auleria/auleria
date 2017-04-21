@@ -31,7 +31,7 @@ export abstract class GameObject
 		this.initialize();
 		if (this.isMaster)
 		{
-			this.workerInitialize();
+			this.masterInitialize();
 		}
 		else
 		{
@@ -42,7 +42,7 @@ export abstract class GameObject
 
 	public initialize() : void { }
 
-	public workerInitialize() : void { }
+	public masterInitialize() : void { }
 
 	public clientInitialize() : void { }
 
