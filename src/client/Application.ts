@@ -3,6 +3,7 @@ import { GameManager } from "./GameManager";
 import { GameWorker } from "./GameWorker";
 import { Tween } from "./Tween";
 import { Commands } from "./Commands";
+import { Input } from "./Input";
 
 declare let Peer : any;
 
@@ -25,6 +26,7 @@ async function main()
 
 		let gameManager = new GameManager();
 		await gameManager.prepareNetwork(id);
+		Input.setup();
 
 		if (host)
 		{
