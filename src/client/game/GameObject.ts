@@ -25,13 +25,26 @@ export abstract class GameObject
 		this._world = world;
 	}
 
-	public abstract initialize() : void
 
 	public externalInitialize() : void
 	{
 		this.initialize();
+		if (this.isMaster)
+		{
+			this.workerInitialize();
+		}
+		else
+		{
+			this.clientInitialize();
+		}
 		this._isInitialized = true;
 	}
+
+	public initialize() : void { }
+
+	public workerInitialize() : void { }
+
+	public clientInitialize() : void { }
 
 	public tick(timescale?: number) : void { }
 
@@ -39,7 +52,7 @@ export abstract class GameObject
 
 	public postUpdate() : void { }
 
-	public abstract onDestroy() : void
+	public onDestroy() : void { }
 
 	public writeToBuffer(bb : ByteBuffer, forced : boolean = false ) : boolean
 	{
