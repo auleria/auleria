@@ -3,11 +3,11 @@ export class Classes
 {
 	private static classes = new Map<string, any>();
 	/**
-	 * Registers a class to let the engine instanciate them at runtime.
+	 * Registers a class to let the engine instantiate them at runtime.
 	 * Used when instancing from a buffer, from a server or a client
 	 * @static
-	 * @param {*} targetClass 
-	 * 
+	 * @param {*} targetClass
+	 *
 	 * @memberOf Classes
 	 */
 	public static register(targetClass : any)
