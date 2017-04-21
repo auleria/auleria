@@ -5,7 +5,7 @@ export class Input
 
 	public static get mouse() { return {x: Input._mouse.x, y: Input._mouse.y, left: false, right: false, middle: false, scroll: 0}; }
 
-	public static setup()
+	public static initialize()
 	{
 		window.addEventListener("mousemove", (e) => {
 			Input._mouse.x = e.clientX;

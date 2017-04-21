@@ -26,7 +26,7 @@ async function main()
 
 		let gameManager = new GameManager();
 		await gameManager.prepareNetwork(id);
-		Input.setup();
+		Input.initialize();
 
 		if (host)
 		{
