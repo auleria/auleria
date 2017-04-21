@@ -46,7 +46,22 @@ export abstract class GameWorld
 		}
 	}
 
-	public abstract initialize() : void
+	public externalInitialize() : void
+	{
+		this.initialize();
+		if (this.isMaster)
+		{
+			this.masterInitialize();
+		}
+		else
+		{
+			this.clientInitialize();
+		}
+	}
+
+	public initialize() : void { }
+	public masterInitialize() : void { }
+	public clientInitialize() : void { }
 
 	public tick(timescale : number)
 	{

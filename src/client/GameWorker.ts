@@ -68,7 +68,7 @@ export class GameWorker
 	{
 		let world = new worldType(id, this.me, true, true, this.me) as GameWorld;
 		world.setBuffer(this.buffer);
-		world.initialize();
+		world.externalInitialize();
 		world.triggerEvent("join", this.me, {});
 		this.world = world;
 	}

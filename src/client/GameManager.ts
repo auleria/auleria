@@ -62,7 +62,7 @@ export class GameManager
 		//Tell the worker to create a new world with the same type and id as the world we just created
 		let worlddata = await workerInterface.request("create world", {worldId: world.id, worldType: world.constructor.name});
 		world.readFromBuffer(new ByteBuffer(worlddata.buffer));
-		world.initialize();
+		world.externalInitialize();
 		let trimmed = world.getBuffer().getTrimmedBuffer();
 		if (trimmed.byteLength > 0) {
 			workerInterface.post("world data", {buffer: trimmed}, [trimmed]);
@@ -183,7 +183,7 @@ export class GameManager
 				let world = new worldType(id, worlddata.owner, false, false, this.peer.id) as GameWorld;
 				world.setBuffer(new ByteBuffer());
 				world.readFromBuffer(new ByteBuffer(worlddata.buffer));
-				world.initialize();
+				world.externalInitialize();
 				let trimmed = world.getBuffer().getTrimmedBuffer();
 				if (trimmed.byteLength > 0) {
 					peer.post("world data passthrough", {buffer: trimmed, id: world.id}, [trimmed]);
