@@ -38,7 +38,6 @@ app.get("/clients", (req, res) => {
 });
 
 app.get("/bundle.js", (req, res) => {
-	console.log("asd");
 	res.sendFile(process.cwd() + "/bin/client/bundle.js");
 });
 
