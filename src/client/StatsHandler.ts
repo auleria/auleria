@@ -5,12 +5,15 @@ export class StatsHandler
 
 	public static initialize () {
 		this.stats = new Stats();
+		this.stats.showPanel(0);
+		document.body.appendChild(this.stats.dom);
+
 		this.stats.begin();
-		requestAnimationFrame(this.endCount);
+		requestAnimationFrame(() => this.handleFrame());
 	}
 
-	private static endCount () {
-		requestAnimationFrame(this.endCount);
+	private static handleFrame () {
+		requestAnimationFrame(() => this.handleFrame());
 		this.stats.end();
 		this.stats.begin();
 	}

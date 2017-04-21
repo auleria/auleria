@@ -4,6 +4,7 @@ import { GameWorker } from "./GameWorker";
 import { Tween } from "./Tween";
 import { Commands } from "./Commands";
 import { Input } from "./Input";
+import { StatsHandler } from "./StatsHandler";
 
 declare let Peer : any;
 
@@ -27,6 +28,7 @@ async function main()
 		let gameManager = new GameManager();
 		await gameManager.prepareNetwork(id);
 		Input.initialize();
+		StatsHandler.initialize();
 
 		if (host)
 		{
