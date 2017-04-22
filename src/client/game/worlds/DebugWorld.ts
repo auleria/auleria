@@ -5,7 +5,7 @@ import { Remote } from "../../Remote";
 import { Classes } from "../../Classes";
 import { NetworkCode } from "../../NetworkCode";
 import { ByteBuffer } from "../../ByteBuffer";
-import { DebugTerrain } from "../objects/DebugTerrain";
+import { Terrain } from "../objects/Terrain";
 import { Input } from "../../Input";
 
 @Classes.register
@@ -15,6 +15,12 @@ export class DebugWorld extends GameWorld
 	private raycaster = new THREE.Raycaster();
 
 	public players = new Map<string, DebugObject>();
+
+	private t = 0;
+	private d = 0;
+	private terrain : Terrain;
+
+	private click = false;
 
 	public initialize()
 	{
@@ -35,8 +41,8 @@ export class DebugWorld extends GameWorld
 		else
 		{
 			console.log("DebugWorld created on client with id", this.id);
-			this.mainCamera.position.z = 2;
-			this.mainCamera.position.y = -2;
+			this.mainCamera.position.z = 60;
+			this.mainCamera.position.y = -60;
 
 			let hemiLight = new THREE.HemisphereLight( 0xddeeff, 0x0f0e0d, 2 );
 			this.scene.add( hemiLight );
@@ -47,36 +53,70 @@ export class DebugWorld extends GameWorld
 
 	public clientInitialize()
 	{
-		console.log("creating debug terrain");
-		let time = Date.now();
-		// tslint:disable-next-line:curly
-		for (let y = 0; y < 5; y++)
-		for (let x = 0; x < 5; x++)
-		{
-			this.add(new DebugTerrain(x - 2.5, y - 2.5));
-		}
-		let result =  Date.now() - time;
-		console.log("Time(ms):", result);
-		console.log("Time per chunk(ms):", result / 25);
+		let terrain = this.add(new Terrain());
 
-		this.point = new THREE.Mesh(new THREE.SphereGeometry(0.02), new THREE.MeshBasicMaterial({color: 0xffffff}));
-		let pointLight = new THREE.PointLight(0xffffff, 1.5, 0.3);
-		this.point.add(pointLight);
-		this.scene.add(this.point);
+		this.point = new THREE.Mesh(new THREE.SphereGeometry(0.2), new THREE.MeshBasicMaterial({color: 0xffffff}));
+		this.point.position.z = 20;
+		//let pointLight = new THREE.PointLight(0xffffff, 1, 32);
+		//pointLight.castShadow = true;
+		//this.point.add(pointLight);
+		//this.scene.add(this.point);
+
+		let lineGeom = new THREE.Geometry();
+		lineGeom.vertices.push(new THREE.Vector3(0, 0, 20));
+		lineGeom.vertices.push(new THREE.Vector3(0, 0, -20));
+		let line = new THREE.Line(lineGeom, new THREE.LineBasicMaterial({color: 0xff0000}));
+		this.point.add(line);
+		//this.scene.add(line);
+
+		terrain.pos = this.point.position;
+		this.terrain = terrain;
 	}
 
 	public update()
 	{
-		super.update();
-		let mouse = {x: (Input.mouse.x / window.innerWidth) * 2 - 1, y: - (Input.mouse.y / window.innerHeight) * 2 + 1};
-		this.raycaster.setFromCamera(mouse, this.mainCamera);
-		let hits = this.raycaster.intersectObjects( this.scene.children );
-		let hit = hits.find(obj => obj.object.name === "terrain");
-		if (hit)
+		this.t += 0.5 / (this.d * Math.PI * 2);
+		if (this.t>=1 && this.d < 10)
 		{
-			this.point.position.x = hit.point.x - hit.face.normal.x * 0.02;
-			this.point.position.y = hit.point.y - hit.face.normal.y * 0.02;
-			this.point.position.z = hit.point.z - hit.face.normal.z * 0.02;
+			this.d++;
+			this.t = 0;
 		}
+		else if (this.d > 10)
+		{
+			this.d = 0;
+			this.t = 0;
+		}
+		this.point.position.x = Math.cos(this.t * 2 * Math.PI) * this.d * 16;
+		this.point.position.y = Math.sin(this.t * 2 * Math.PI) * this.d * 16;
+
+		if ((Input.mouse.left && !this.click) || Input.mouse.right)
+		{
+			let mouse = {x: (Input.mouse.x / window.innerWidth) * 2 - 1, y: - (Input.mouse.y / window.innerHeight) * 2 + 1};
+			this.raycaster.setFromCamera(mouse, this.mainCamera);
+			let hits = this.raycaster.intersectObjects( this.scene.children );
+			let hit = hits.find(obj => obj.object.name === "terrain");
+			if (hit)
+			{
+				let radius = 5;
+				// tslint:disable-next-line:curly
+				for (let x = -radius; x <= radius; x++)
+				// tslint:disable-next-line:curly
+				for (let y = -radius; y <= radius; y++)
+				// tslint:disable-next-line:curly
+				for (let z = -radius; z <= radius; z++)
+				{
+					this.terrain.setData(hit.point.x + x, hit.point.y + y, hit.point.z - z, -1);
+				}
+
+				this.terrain.updateTerrain();
+			}
+			this.click = true;
+		}
+		else if (!Input.mouse.left)
+		{
+			this.click = false;
+		}
+
+		super.update();
 	}
 }
