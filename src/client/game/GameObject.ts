@@ -2,6 +2,7 @@ import { Helper } from "../Helper";
 import { GameWorld } from "./GameWorld";
 import { Transform } from "./Transform";
 import { ByteBuffer } from "../ByteBuffer";
+import { Classes } from "../Classes";
 
 export abstract class GameObject
 {
@@ -19,12 +20,16 @@ export abstract class GameObject
 	@Helper.sealed
 	public transform = new Transform();
 
+	public static register(target : any)
+	{
+		Classes.register(target);
+	}
+
 	public preInitialize(world : GameWorld, id? : string)
 	{
 		this._id = id || this._id;
 		this._world = world;
 	}
-
 
 	public externalInitialize() : void
 	{

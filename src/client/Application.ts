@@ -1,3 +1,10 @@
+if (isWorker())
+{
+	console.log("Importing three.js into the wroker...");
+	importScripts("/three/three.min.js");
+	console.log("Done!");
+}
+
 import { Helper } from "./Helper";
 import { GameManager } from "./GameManager";
 import { GameWorker } from "./GameWorker";
@@ -7,21 +14,16 @@ import { Input } from "./Input";
 import { StatsHandler } from "./StatsHandler";
 
 declare let Peer : any;
-
+let t = THREE;
 main();
 async function main()
 {
 	if (isWorker())
 	{
-		console.log("Importing three.js into the wroker...");
-		importScripts("/three/three.min.js");
-		console.log("Done!");
-
 		let worker = new GameWorker();
 	}
 	else
 	{
-
 		let id = getHashParameter("id");
 		let host = getHashParameter("host");
 

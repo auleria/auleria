@@ -34,7 +34,7 @@ export class DebugObject extends GameObject
 		{
 			Tween.simple(this, "x");
 
-			let geometry = new THREE.BoxGeometry(0.1, 0.1, 0.1);
+			let geometry = new THREE.BoxGeometry(1, 1, 1);
 			this.boxMesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({color: 0xffffff}));
 
 			this.boxMesh.position.y = this.y;

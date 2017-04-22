@@ -32,6 +32,7 @@ export class GameManager
 	constructor()
 	{
 		this.mainRenderer = new THREE.WebGLRenderer({antialias: true});
+		this.mainRenderer.shadowMap.enabled = true;
 		this.mainRenderer.setSize(window.innerWidth, window.innerHeight);
 		window.addEventListener("resize", () => {
 			this.mainRenderer.setSize(window.innerWidth, window.innerHeight);
@@ -207,6 +208,7 @@ export class GameManager
 
 		Tween.update();
 		this.worlds.forEach(world => {
+			if (!world.isInitialized) { return; }
 			world.update();
 			world.writeToBuffer();
 			world.postUpdate();

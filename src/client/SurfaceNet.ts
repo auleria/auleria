@@ -120,9 +120,9 @@ export class SurfaceNet
 					}
 
 					let s = 1.0 / eCount;
-					v[0] = (x[0] + s * v[0]) * (1 / (dims.x-2));		//VERTEX HERE
-					v[1] = (x[1] + s * v[1]) * (1 / (dims.y-2));		//VERTEX HERE
-					v[2] = (x[2] + s * v[2]) * (1 / (dims.z-2));		//VERTEX HERE
+					v[0] = (x[0] + s * v[0]) * (1 / (dims.x - 2)) - (0.5 / dims.x);		//VERTEX HERE
+					v[1] = (x[1] + s * v[1]) * (1 / (dims.y - 2)) - (0.5 / dims.y);		//VERTEX HERE
+					v[2] = (x[2] + s * v[2]) * (1 / (dims.z - 2)) - (0.5 / dims.z);		//VERTEX HERE
 
 					SurfaceNet.buffer[m] = vertices.length;
 					vertices.push(v);
@@ -200,6 +200,4 @@ export class SurfaceNet
 	}
 }
 
-console.log("Preparing SurfaceNet");
 SurfaceNet.prepare();
-console.log("Done");
