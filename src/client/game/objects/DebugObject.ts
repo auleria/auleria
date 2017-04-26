@@ -40,9 +40,6 @@ export class DebugObject extends GameObject
 			this.boxMesh.position.y = this.y;
 			this.world.scene.add(this.boxMesh);
 		}
-
-		let dworld = this.world as DebugWorld;
-		dworld.players.set(this.playerID, this);
 	}
 
 	public writeToBuffer(buffer : ByteBuffer, forced : boolean)

@@ -1,6 +1,6 @@
 
 import { GameWorld } from "../GameWorld";
-import { DebugObject } from "../objects/DebugObject";
+import { PlayerCharacter } from "../objects/PlayerCharacter";
 import { Remote } from "../../Remote";
 import { Classes } from "../../Classes";
 import { NetworkCode } from "../../NetworkCode";
@@ -14,7 +14,7 @@ export class DebugWorld extends GameWorld
 	private point : THREE.Mesh;
 	private raycaster = new THREE.Raycaster();
 
-	public players = new Map<string, DebugObject>();
+	public players = new Map<string, PlayerCharacter>();
 
 	private t = 0;
 	private d = 0;
@@ -29,7 +29,7 @@ export class DebugWorld extends GameWorld
 			console.log("Debug World created, id is", this.id, "me is", this.me);
 
 			this.on("join", (data, playerid) => {
-				this.add(new DebugObject(playerid));
+				this.add(new PlayerCharacter(playerid));
 			});
 
 			this.on("left", (data, playerid) => {
