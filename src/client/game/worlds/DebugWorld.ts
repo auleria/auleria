@@ -93,10 +93,8 @@ export class DebugWorld extends GameWorld
 		{
 			let mouse = {x: (Input.mouse.x / window.innerWidth) * 2 - 1, y: - (Input.mouse.y / window.innerHeight) * 2 + 1};
 
-			this.raycaster.setFromCamera(mouse, this.mainCamera);
-			let hits = this.raycaster.intersectObjects( this.scene.children );
-
-			let hit = hits.find(obj => obj.object.name === "terrain");
+			this.terrain.raycaster.setFromCamera(mouse, this.mainCamera);
+			let hit = this.terrain.trace();
 			if (hit)
 			{
 				let radius = 1;
@@ -107,7 +105,7 @@ export class DebugWorld extends GameWorld
 				// tslint:disable-next-line:curly
 				for (let z = -radius; z <= radius; z++)
 				{
-					this.terrain.setData(hit.point.x + x, hit.point.y + y, hit.point.z - z, -1);
+					this.terrain.setData(hit.point.x + x, hit.point.y + y, hit.point.z - z, 1);
 				}
 
 				this.terrain.updateTerrain();

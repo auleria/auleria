@@ -4,7 +4,7 @@ export class Tween
 	public static enabled = !isWorker();
 	private static properties = new Array<any>();
 
-	public static tickrate = 3;
+	public static tickrate = 20;
 
 	public static simple(target : any, property : string)
 	{
@@ -32,6 +32,24 @@ export class Tween
 				}
 				prop.time = Date.now();
 			}});
+		}
+	}
+
+	public static simpleRecursive(target : any, pattern : RegExp, original : object = null)
+	{
+		if (!original) { original = target; }
+		for (let prop in target)
+		{
+			if (target[prop] === original && pattern.test(prop)) { continue; }
+
+			if (typeof target[prop] === "object")
+			{
+				Tween.simpleRecursive(target[prop], pattern, original);
+			}
+			else
+			{
+				Tween.simple(target, prop);
+			}
 		}
 	}
 
