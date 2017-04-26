@@ -13,8 +13,8 @@ export class Terrain extends GameObject
 	private mesh : THREE.Mesh;
 	private data : Float32Array;
 	private chunks = new Map3<number, number, number, Chunk>();
-	public resolution = {x: 16, y: 16, z: 32};
-	public chunkSize = {x: 16, y: 16, z: 32};
+	public resolution = {x: 16, y: 16, z: 16};
+	public chunkSize = {x: 16, y: 16, z: 16};
 
 	public simplex : Simplex;
 	public pos : THREE.Vector3;
@@ -128,7 +128,7 @@ class Chunk
 	private _y : number;
 	private _z : number;
 	private _mesh : THREE.Mesh;
-	private _geometry : THREE.Geometry;
+	private _geometry : THREE.BufferGeometry;
 	private _terrain : Terrain;
 	private data : Float32Array;
 
@@ -153,7 +153,7 @@ class Chunk
 		this._mesh = new THREE.Mesh();
 		this._mesh.castShadow = true;
 		this._mesh.receiveShadow = true;
-		this._mesh.material = new THREE.MeshStandardMaterial({color: 0xaaff99, side: THREE.DoubleSide});
+		this._mesh.material = new THREE.MeshStandardMaterial({color: 0xaaff99, side: THREE.DoubleSide});	//0xaaff99
 		this._mesh.scale.set(this._terrain.chunkSize.x, this._terrain.chunkSize.y, this._terrain.chunkSize.z);
 
 		// let boundingBox = new THREE.LineSegments(new THREE.BoxGeometry(1, 1, 1), new THREE.LineBasicMaterial({color: 0xffff00}));
@@ -193,28 +193,32 @@ class Chunk
 
 	public updateMesh()
 	{
-		let geometry = new THREE.Geometry();
 
+		console.log("updating chunk");
+		let time = Date.now();
 		let meshData = SurfaceNet.march(this.data, {x: this._terrain.resolution.x, y: this._terrain.resolution.y, z: this._terrain.resolution.z});
 
-		meshData.vertices.forEach(vertex => geometry.vertices.push(new THREE.Vector3(vertex[0], vertex[1], vertex[2])));
-		meshData.faces.forEach(face => geometry.faces.push(new THREE.Face3(face[0], face[1], face[2])));
+		let vertices = new Float32Array(meshData.vertices);
 
-		this._mesh.geometry = geometry;
+		let indices = new Uint16Array(meshData.faces);
+
+		let bufferGeometry = new THREE.BufferGeometry();
+		bufferGeometry.setIndex(new THREE.BufferAttribute(indices, 1));
+		bufferGeometry.addAttribute("position", new THREE.BufferAttribute(vertices, 3));
+		bufferGeometry.addAttribute("normal", new THREE.BufferAttribute(meshData.normals, 3));
+		bufferGeometry.computeVertexNormals();
+
+		this._mesh.geometry = bufferGeometry;
 		this._mesh.name = "terrain";
 		this._mesh.position.x = this.x * this._terrain.chunkSize.x;
 		this._mesh.position.y = this.y * this._terrain.chunkSize.y;
 		this._mesh.position.z = this.z * this._terrain.chunkSize.z;
 
-		geometry.mergeVertices();
-		geometry.computeFaceNormals();
-		geometry.computeVertexNormals();
-		geometry.verticesNeedUpdate = true;
-		geometry.elementsNeedUpdate = true;
-		geometry.normalsNeedUpdate = true;
+		this._geometry = bufferGeometry;
 
-		this._geometry = geometry;
-	}
+		let result =  Date.now() - time;
+		console.log("Time(ms):", result);
+}
 
 	public update()
 	{
