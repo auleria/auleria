@@ -92,12 +92,14 @@ export class DebugWorld extends GameWorld
 		if ((Input.mouse.left && !this.click) || Input.mouse.right)
 		{
 			let mouse = {x: (Input.mouse.x / window.innerWidth) * 2 - 1, y: - (Input.mouse.y / window.innerHeight) * 2 + 1};
+
 			this.raycaster.setFromCamera(mouse, this.mainCamera);
 			let hits = this.raycaster.intersectObjects( this.scene.children );
+
 			let hit = hits.find(obj => obj.object.name === "terrain");
 			if (hit)
 			{
-				let radius = 5;
+				let radius = 1;
 				// tslint:disable-next-line:curly
 				for (let x = -radius; x <= radius; x++)
 				// tslint:disable-next-line:curly
