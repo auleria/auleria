@@ -15,14 +15,13 @@ export class Terrain extends GameObject
 	private chunks = new Map3<number, number, number, Chunk>();
 	public resolution = {x: 16, y: 16, z: 16};
 	public chunkSize = {x: 16, y: 16, z: 16};
+	public raycaster = new THREE.Raycaster();
 
 	public simplex : Simplex;
 	public pos : THREE.Vector3;
 
 	public clientInitialize(): void {
-
 		this.simplex = new Simplex(new Alea(this.world.id));
-
 		this.pos = new THREE.Vector3();
 	}
 
@@ -114,6 +113,16 @@ export class Terrain extends GameObject
 		z = Math.floor(z / this.chunkSize.z);
 
 		return this.chunks.get(x, y, z);
+	}
+
+	public trace() : THREE.Intersection
+	{
+		let hits = this.raycaster.intersectObjects( this.world.scene.children );
+		let hit = hits.find(ray => ray.object.name === "terrain");
+		if (hit)
+		{
+			return hit;
+		}
 	}
 
 	public onDestroy(): void
