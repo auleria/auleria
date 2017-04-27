@@ -175,20 +175,20 @@ export class SurfaceNet
 
 		for (let i = 0; i < faces.length; i += 3)
 		{
-			let a = i * 3;
-			let b = i * 3 + 1;
-			let c = i * 3 + 2;
-			let ax = vertices[faces[a]];
-			let ay = vertices[faces[a + 1]];
-			let az = vertices[faces[a + 2]];
+			a = i * 3;
+			b = i * 3 + 1;
+			c = i * 3 + 2;
+			ax = vertices[faces[a]];
+			ay = vertices[faces[a + 1]];
+			az = vertices[faces[a + 2]];
 
-			let bx = vertices[faces[b]];
-			let by = vertices[faces[b + 1]];
-			let bz = vertices[faces[b + 2]];
+			bx = vertices[faces[b]];
+			by = vertices[faces[b + 1]];
+			bz = vertices[faces[b + 2]];
 
-			let cx = vertices[faces[c]];
-			let cy = vertices[faces[c + 1]];
-			let cz = vertices[faces[c + 2]];
+			cx = vertices[faces[c]];
+			cy = vertices[faces[c + 1]];
+			cz = vertices[faces[c + 2]];
 
 			u[0] = bx - ax;
 			u[1] = by - ay;
@@ -197,15 +197,9 @@ export class SurfaceNet
 			v[1] = cy - ay;
 			v[2] = cz - az;
 
-			let normal = [
-				u[1] * v[2] - u[2] * v[1],
-				u[2] * v[0] - u[0] * v[2],
-				u[0] * v[1] - u[1] * v[0]
-			];
-
-			normals[i] = normal[0];
-			normals[i + 1] = normal[1];
-			normals[i + 2] = normal[2];
+			normals[i] = u[1] * v[2] - u[2] * v[1];
+			normals[i + 1] = u[2] * v[0] - u[0] * v[2];
+			normals[i + 2] = u[0] * v[1] - u[1] * v[0];
 		}
 
 		return { vertices : vertices, faces: faces, normals: normals };
