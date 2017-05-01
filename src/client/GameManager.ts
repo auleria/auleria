@@ -9,6 +9,7 @@ import { Classes } from "./Classes";
 import { NetworkHub } from "./NetworkHub";
 import { Tween } from "./Tween";
 import { Commands } from "./Commands";
+import { StatsHandler } from "./StatsHandler";
 
 declare let Peer: any;
 
@@ -205,6 +206,7 @@ export class GameManager
 	private update()
 	{
 		requestAnimationFrame(() => this.update());
+		StatsHandler.begin();
 
 		Tween.update();
 		this.worlds.forEach(world => {
@@ -232,6 +234,8 @@ export class GameManager
 			world.setBuffer(new ByteBuffer());
 			world.render();
 		});
+
+		StatsHandler.end();
 
 	}
 
