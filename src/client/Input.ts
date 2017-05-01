@@ -14,7 +14,7 @@ export class Input
 		Jump: " "
 	};
 
-	private static keys = {
+	public static keys = {
 		Forward: false,
 		Backward: false,
 		TurnLeft: false,
@@ -63,7 +63,6 @@ export class Input
 			if (event.key === key)
 			{
 				(this.keys as any)[input] = true;
-				console.log(key, "pressed.", input, "activated");
 				break;
 			}
 		}
