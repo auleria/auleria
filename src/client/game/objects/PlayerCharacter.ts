@@ -1,8 +1,10 @@
+import { ByteBuffer } from "../../ByteBuffer";
 import { Character } from "./Character";
 import { Classes } from "../../Classes";
 import { DebugWorld } from "../worlds/DebugWorld";
 import { Tween } from "../../Tween";
 import { Input } from "../../Input";
+import { Transform } from "../Transform";
 
 @Classes.register
 export class PlayerCharacter extends Character
@@ -26,9 +28,14 @@ export class PlayerCharacter extends Character
 	}
 
 	public clientInitialize() : void {
-		Tween.simpleRecursive(this.transform.position, /^(x|y|z)$/);
+		if (!this.isOwner)
+		{
+			Tween.simpleRecursive(this.transform.position, /^(x|y|z)$/);
+			//Tween.simpleRecursive(this.transform.scale, /^(x|y|z)$/);
+			Tween.simpleRecursive(this.transform.rotation, /^(x|y|z|w)$/);
+		}
 
-		this.transform.position = new THREE.Vector3(0, 0, 10);
+		this.transform.position.set(0, 0, 10);
 		this.movementSpeed = 3;
 
 		let geometry = new THREE.BoxGeometry(1, 1, 2);
@@ -72,13 +79,35 @@ export class PlayerCharacter extends Character
 
 	public postUpdate () {
 		super.postUpdate();
-		(this.world as DebugWorld).terrain.poi = this.transform.position;
+		if (this.isOwner)
+		{
+			(this.world as DebugWorld).terrain.poi.copy(this.transform.position);
+		}
 	}
 
 	public onDestroy() : void {
 		if (!this.isMaster)
 		{
 			this.world.scene.remove(this.mesh);
+		}
+	}
+
+	public writeToBuffer(buffer : ByteBuffer, fullSync : boolean) : boolean {
+		if (this.isMaster || this.isOwner) {
+			this.transform.writePositionToBuffer(buffer);
+			this.transform.writeRotationToBuffer(buffer);
+			return true;
+		}
+	}
+
+	public readFromBuffer(buffer : ByteBuffer, fullSync : boolean) {
+		if (this.isOwner && !this.isMaster) {
+			buffer.moveForward(Transform.positionByteLength + Transform.rotationByteLength);
+		}
+
+		else {
+			this.transform.readPositionFromBuffer(buffer);
+			this.transform.readRotationFromBuffer(buffer);
 		}
 	}
 }
