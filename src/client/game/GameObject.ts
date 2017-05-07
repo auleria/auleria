@@ -72,12 +72,12 @@ export abstract class GameObject
 
 	public onDestroy() : void { }
 
-	public writeToBuffer(bb : ByteBuffer, forced : boolean = false ) : boolean
+	public writeToBuffer(bb : ByteBuffer, fullSync : boolean = false ) : boolean
 	{
 		return false;
 	}
 
-	public readFromBuffer(bb : ByteBuffer, forced : boolean = false)
+	public readFromBuffer(bb : ByteBuffer, fullSync : boolean = false)
 	{
 		return;
 	}
