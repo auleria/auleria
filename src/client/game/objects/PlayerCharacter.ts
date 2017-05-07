@@ -51,13 +51,13 @@ export class PlayerCharacter extends Character
 			this.transform.rotation.setFromEuler(euler);
 		}
 
-		if(Input.keys.Forward)
+		if(Input.keys.Forward || Input.keys.Backward)
 		{
 			let velocity = new THREE.Vector3().copy(this.forward);
 			velocity.applyQuaternion(this.transform.rotation);
 			velocity.normalize();
 
-			velocity.multiplyScalar(this.movementSpeed * timeScale);
+			velocity.multiplyScalar((Input.keys.Forward) ? this.movementSpeed * timeScale : -this.movementSpeed * timeScale);
 
 			this.transform.position.add(velocity);
 		}
