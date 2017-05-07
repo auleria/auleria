@@ -10,7 +10,7 @@ export abstract class GameObject
 	private _world : GameWorld;
 	private _isInitialized : boolean;
 	private isDestroyed = false;
-	private _owner : string;
+	private _owner : string = null;
 
 	public get id() { return this._id; }
 	public get world() { return this._world; }
@@ -30,7 +30,10 @@ export abstract class GameObject
 	{
 		this._id = id || this._id;
 		this._world = world;
-		this._owner = world.owner;
+		if (this._owner === null)
+		{
+			this._owner = world.owner;
+		}
 	}
 
 	public externalInitialize() : void
