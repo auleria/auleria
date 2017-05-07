@@ -26,7 +26,7 @@ export abstract class GameWorld
 
 	private gameObjects = new Map<string, GameObject>();
 	private _scene : THREE.Scene;
-	protected mainCamera : THREE.PerspectiveCamera;
+	public mainCamera : THREE.PerspectiveCamera;
 	private renderer : THREE.Renderer;
 
 	private eventListeners = new Map<string, Function>();
