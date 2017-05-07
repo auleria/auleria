@@ -53,7 +53,7 @@ export class PlayerCharacter extends Character
 			if(Input.keys.StrafeLeft || Input.keys.StrafeRight)
 			{
 				let euler = new THREE.Euler().setFromQuaternion(this.transform.rotation);
-				euler.z += (Input.keys.StrafeRight) ? -0.15 * timeScale : 0.15 * timeScale;
+				euler.z += (Input.keys.StrafeRight) ? -0.5 * timeScale : 0.5 * timeScale;
 				this.transform.rotation.setFromEuler(euler);
 			}
 
