@@ -72,12 +72,12 @@ export abstract class GameWorld
 		}
 	}
 
-	public update()
+	public update(timescale : number)
 	{
 		for (let kvp of this.gameObjects)
 		{
 			let object = kvp[1];
-			object.update();
+			object.update(timescale);
 		}
 	}
 

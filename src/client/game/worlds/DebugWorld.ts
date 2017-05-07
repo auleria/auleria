@@ -72,22 +72,8 @@ export class DebugWorld extends GameWorld
 		this.terrain = terrain;
 	}
 
-	public update()
+	public update(tickrate : number)
 	{
-		this.t += 0.5 / (this.d * Math.PI * 2);
-		if (this.t>=1 && this.d < 10)
-		{
-			this.d++;
-			this.t = 0;
-		}
-		else if (this.d > 10)
-		{
-			this.d = 0;
-			this.t = 0;
-		}
-		this.point.position.x = Math.cos(this.t * 2 * Math.PI) * this.d * 16;
-		this.point.position.y = Math.sin(this.t * 2 * Math.PI) * this.d * 16;
-
-		super.update();
+		super.update(tickrate);
 	}
 }
