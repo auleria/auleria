@@ -53,6 +53,7 @@ export class Input
 		});
 
 		window.addEventListener("keydown", (e) => this.handleKeyDown(e));
+		window.addEventListener("keyup", (e) => this.handleKeyUp(e));
 	}
 
 	private static handleKeyDown(event : KeyboardEvent)
