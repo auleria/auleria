@@ -5,9 +5,7 @@ import { Classes } from "../../Classes";
 export abstract class Character extends GameObject
 {
 	protected mesh : THREE.Mesh;
-
 	protected movementSpeed : number;
-	protected running : boolean;
 
 	constructor()
 	{

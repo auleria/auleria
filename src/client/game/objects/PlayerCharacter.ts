@@ -34,7 +34,6 @@ export class PlayerCharacter extends Character
 		if (!this.isOwner)
 		{
 			Tween.simpleRecursive(this.transform.position, /^(x|y|z)$/);
-			//Tween.simpleRecursive(this.transform.scale, /^(x|y|z)$/);
 			Tween.simpleRecursive(this.transform.rotation, /^(x|y|z|w)$/);
 		}
 
