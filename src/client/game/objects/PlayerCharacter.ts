@@ -7,7 +7,7 @@ import { Input } from "../../Input";
 @Classes.register
 export class PlayerCharacter extends Character
 {
-	private camera : THREE.PerspectiveCamera;
+	public group : THREE.Group;
 	public playerID : string;
 
 	constructor(playerid : string)
@@ -23,13 +23,14 @@ export class PlayerCharacter extends Character
 
 	public masterInitialize() : void {
 		console.log("created player object with id", super.id);
-		this.transform.position = new THREE.Vector3(0,0,30);
+		this.transform.position = new THREE.Vector3(0, 0, 10);
 	}
 
 	public clientInitialize() : void {
 		Tween.simpleRecursive(this.transform.position, /^(x|y|z)$/);
 
-		this.transform.position = new THREE.Vector3(0, 0, 30);
+		this.group = new THREE.Group();
+		this.transform.position = new THREE.Vector3(0, 0, 10);
 
 		let geometry = new THREE.BoxGeometry(1, 1, 2);
 		let material = new THREE.MeshStandardMaterial({color: 0xFFFFFF});
@@ -37,29 +38,32 @@ export class PlayerCharacter extends Character
 
 		this.movementSpeed = 3;
 
-		this.mesh.position.copy(this.transform.position);
-		this.world.scene.add(this.mesh);
+		this.group.position.copy(this.transform.position);
+		this.group.add(this.mesh);
+		this.world.scene.add(this.group);
 	}
 
 	public update(timeScale : number) : void {
 		super.update(timeScale);
 
-		if(Input.keys.StrafeLeft || Input.keys.StrafeRight)
-		{
-			let euler = new THREE.Euler().setFromQuaternion(this.transform.rotation);
-			euler.z += (Input.keys.StrafeRight) ? -0.15 * timeScale : 0.15 * timeScale;
-			this.transform.rotation.setFromEuler(euler);
-		}
+		if(this.isOwner) {
+			if(Input.keys.StrafeLeft || Input.keys.StrafeRight)
+			{
+				let euler = new THREE.Euler().setFromQuaternion(this.transform.rotation);
+				euler.z += (Input.keys.StrafeRight) ? -0.15 * timeScale : 0.15 * timeScale;
+				this.transform.rotation.setFromEuler(euler);
+			}
 
-		if(Input.keys.Forward || Input.keys.Backward)
-		{
-			let velocity = new THREE.Vector3().copy(this.forward);
-			velocity.applyQuaternion(this.transform.rotation);
-			velocity.normalize();
+			if(Input.keys.Forward || Input.keys.Backward)
+			{
+				let velocity = new THREE.Vector3().copy(this.forward);
+				velocity.applyQuaternion(this.transform.rotation);
+				velocity.normalize();
 
-			velocity.multiplyScalar((Input.keys.Forward) ? this.movementSpeed * timeScale : -this.movementSpeed * timeScale);
+				velocity.multiplyScalar((Input.keys.Forward) ? this.movementSpeed * timeScale : -this.movementSpeed * timeScale);
 
-			this.transform.position.add(velocity);
+				this.transform.position.add(velocity);
+			}
 		}
 	}
 
