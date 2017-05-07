@@ -7,7 +7,6 @@ import { Input } from "../../Input";
 @Classes.register
 export class PlayerCharacter extends Character
 {
-	public group : THREE.Group;
 	public playerID : string;
 
 	constructor(playerid : string)
@@ -29,7 +28,6 @@ export class PlayerCharacter extends Character
 	public clientInitialize() : void {
 		Tween.simpleRecursive(this.transform.position, /^(x|y|z)$/);
 
-		this.group = new THREE.Group();
 		this.transform.position = new THREE.Vector3(0, 0, 10);
 
 		let geometry = new THREE.BoxGeometry(1, 1, 2);
@@ -38,9 +36,8 @@ export class PlayerCharacter extends Character
 
 		this.movementSpeed = 3;
 
-		this.group.position.copy(this.transform.position);
-		this.group.add(this.mesh);
-		this.world.scene.add(this.group);
+		this.mesh.position.copy(this.transform.position);
+		this.world.scene.add(this.mesh);
 	}
 
 	public update(timeScale : number) : void {
