@@ -6,8 +6,8 @@ export abstract class Character extends GameObject
 {
 	protected mesh : THREE.Mesh;
 
-	private movementSpeed : number;
-	private running : boolean;
+	protected movementSpeed : number;
+	protected running : boolean;
 
 	constructor()
 	{
@@ -30,8 +30,12 @@ export abstract class Character extends GameObject
 
 	}
 
-	public update() : void {
+	public update(timeScale : number) : void {
+	}
+
+	public postUpdate() : void {
 		this.mesh.position.copy(this.transform.position);
+		this.mesh.rotation.copy(new THREE.Euler().setFromQuaternion(this.transform.rotation));
 	}
 
 	public move() : void {

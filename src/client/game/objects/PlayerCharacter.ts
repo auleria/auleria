@@ -27,23 +27,45 @@ export class PlayerCharacter extends Character
 	}
 
 	public clientInitialize() : void {
-		Tween.simpleRecursive(this.transform.position, /.+/);
+		Tween.simpleRecursive(this.transform.position, /^(x|y|z)$/);
 
-		let geometry = new THREE.SphereGeometry(10, 32, 32);
+		this.transform.position = new THREE.Vector3(0, 0, 30);
+
+		let geometry = new THREE.BoxGeometry(1, 1, 2);
 		let material = new THREE.MeshStandardMaterial({color: 0xFFFFFF});
 		this.mesh = new THREE.Mesh(geometry, material);
+
+		this.movementSpeed = 3;
 
 		this.mesh.position.copy(this.transform.position);
 		this.world.scene.add(this.mesh);
 	}
 
-	public update() : void {
-		super.update();
+	public update(timeScale : number) : void {
+		super.update(timeScale);
 
-		if(Input.mouse.left)
+		if(Input.keys.StrafeLeft || Input.keys.StrafeRight)
 		{
-			this.transform.position.x += 10;
+			let euler = new THREE.Euler().setFromQuaternion(this.transform.rotation);
+			euler.z += (Input.keys.StrafeRight) ? -0.15 * timeScale : 0.15 * timeScale;
+			this.transform.rotation.setFromEuler(euler);
 		}
+
+		if(Input.keys.Forward)
+		{
+			let velocity = new THREE.Vector3().copy(this.forward);
+			velocity.applyQuaternion(this.transform.rotation);
+			velocity.normalize();
+
+			velocity.multiplyScalar(this.movementSpeed * timeScale);
+
+			this.transform.position.add(velocity);
+		}
+	}
+
+	public postUpdate () {
+		super.postUpdate();
+		(this.world as DebugWorld).terrain.poi = this.transform.position;
 	}
 
 	public onDestroy() : void {
