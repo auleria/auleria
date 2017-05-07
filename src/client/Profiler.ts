@@ -56,7 +56,7 @@ export class Profiler
 	}
 }
 
-interface ISection
+export interface ISection
 {
 	parent : ISection;
 	name : string;
