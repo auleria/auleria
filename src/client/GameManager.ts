@@ -10,6 +10,7 @@ import { NetworkHub } from "./NetworkHub";
 import { Tween } from "./Tween";
 import { Commands } from "./Commands";
 import { StatsHandler } from "./StatsHandler";
+import { Profiler } from "./Profiler";
 
 declare let Peer: any;
 
@@ -27,6 +28,8 @@ export class GameManager
 
 	private mainRenderer : THREE.WebGLRenderer;
 	private subRenderers = new Map<string, THREE.WebGLRenderTarget>();
+
+	private lastTick = 0;
 
 	public get canvas() { return this.mainRenderer.domElement; }
 
@@ -207,11 +210,14 @@ export class GameManager
 	{
 		requestAnimationFrame(() => this.update());
 		StatsHandler.begin();
+		Profiler.begin("update");
+
+		let timescale = 1 / (this.lastTick - Date.now());
 
 		Tween.update();
 		this.worlds.forEach(world => {
 			if (!world.isInitialized) { return; }
-			world.update();
+			world.update(timescale);
 			world.writeToBuffer();
 			world.postUpdate();
 
@@ -235,6 +241,7 @@ export class GameManager
 			world.render();
 		});
 
+		Profiler.end();
 		StatsHandler.end();
 
 	}
