@@ -51,11 +51,13 @@ export class QuadTreeTerrain extends GameObject
 		this.material = new THREE.MeshStandardMaterial({color: 0xaaff99});
 	}
 
+	public getHeightAt(x : number, y : number)
+	{
+		
+	}
+
 	public update()
 	{
-		this.t += 0.001;
-		this.poi.x = Math.cos(this.t) * 1000;
-		this.poi.y = Math.sin(this.t) * 1000;
 		this.tree.forEach(quad => this.handleQuad(quad));
 	}
 
