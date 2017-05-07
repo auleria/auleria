@@ -10,11 +10,12 @@ export abstract class GameObject
 	private _world : GameWorld;
 	private _isInitialized : boolean;
 	private isDestroyed = false;
+	private _owner : string;
 
 	public get id() { return this._id; }
 	public get world() { return this._world; }
 	public get isMaster() { return this._world.isMaster; }
-	public get isOwner() { return this._world.isOwner; }
+	public get isOwner() { return this._owner === this.world.me; }
 	public get isInitialized() { return this._isInitialized; }
 
 	@Helper.sealed
@@ -29,6 +30,7 @@ export abstract class GameObject
 	{
 		this._id = id || this._id;
 		this._world = world;
+		this._owner = world.owner;
 	}
 
 	public externalInitialize() : void
@@ -43,6 +45,11 @@ export abstract class GameObject
 			this.clientInitialize();
 		}
 		this._isInitialized = true;
+	}
+
+	public setOwner(newOwner : string)
+	{
+		this._owner = newOwner;
 	}
 
 	public initialize() : void { }
