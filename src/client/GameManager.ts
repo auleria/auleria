@@ -49,7 +49,7 @@ export class GameManager
 	public async createWorld()
 	{
 		//Create the new world, make sure it's not a master
-		let world = new DebugWorld(null, this.peer.peer, true, false, this.peer.id);
+		let world = new DebugWorld(null, this.peer.id, true, false, this.peer.id);
 
 		//Create a new worker
 		let worldWorker = new Worker("/bundle.js");
