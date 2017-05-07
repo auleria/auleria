@@ -34,6 +34,7 @@ export class DebugWorld extends GameWorld
 		this.on("join", (data, playerid) => {
 			let pc = new PlayerCharacter(playerid);
 			this.transferOwner(pc, playerid);
+			this.players.set(playerid, pc);
 			this.add(pc);
 		});
 
