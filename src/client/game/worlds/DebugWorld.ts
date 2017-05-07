@@ -5,8 +5,8 @@ import { Remote } from "../../Remote";
 import { Classes } from "../../Classes";
 import { NetworkCode } from "../../NetworkCode";
 import { ByteBuffer } from "../../ByteBuffer";
-import { Terrain } from "../objects/Terrain";
 import { Input } from "../../Input";
+import { SimpleTerrain } from "../objects/SimpleTerrain";
 
 @Classes.register
 export class DebugWorld extends GameWorld
@@ -18,7 +18,7 @@ export class DebugWorld extends GameWorld
 
 	private t = 0;
 	private d = 0;
-	private terrain : Terrain;
+	private terrain : SimpleTerrain;
 
 	private click = false;
 
@@ -53,7 +53,7 @@ export class DebugWorld extends GameWorld
 
 	public clientInitialize()
 	{
-		let terrain = this.add(new Terrain());
+		let terrain = this.add(new SimpleTerrain());
 
 		this.point = new THREE.Mesh(new THREE.SphereGeometry(0.2), new THREE.MeshBasicMaterial({color: 0xffffff}));
 		this.point.position.z = 20;
@@ -69,7 +69,6 @@ export class DebugWorld extends GameWorld
 		this.point.add(line);
 		//this.scene.add(line);
 
-		terrain.pos = this.point.position;
 		this.terrain = terrain;
 	}
 
@@ -89,33 +88,33 @@ export class DebugWorld extends GameWorld
 		this.point.position.x = Math.cos(this.t * 2 * Math.PI) * this.d * 16;
 		this.point.position.y = Math.sin(this.t * 2 * Math.PI) * this.d * 16;
 
-		if ((Input.mouse.left && !this.click) || Input.mouse.right)
-		{
-			let mouse = {x: (Input.mouse.x / window.innerWidth) * 2 - 1, y: - (Input.mouse.y / window.innerHeight) * 2 + 1};
+		// if ((Input.mouse.left && !this.click) || Input.mouse.right)
+		// {
+		// 	let mouse = {x: (Input.mouse.x / window.innerWidth) * 2 - 1, y: - (Input.mouse.y / window.innerHeight) * 2 + 1};
 
-			this.terrain.raycaster.setFromCamera(mouse, this.mainCamera);
-			let hit = this.terrain.trace();
-			if (hit)
-			{
-				let radius = 1;
-				// tslint:disable-next-line:curly
-				for (let x = -radius; x <= radius; x++)
-				// tslint:disable-next-line:curly
-				for (let y = -radius; y <= radius; y++)
-				// tslint:disable-next-line:curly
-				for (let z = -radius; z <= radius; z++)
-				{
-					this.terrain.setData(hit.point.x + x, hit.point.y + y, hit.point.z - z, 1);
-				}
+		// 	this.terrain.raycaster.setFromCamera(mouse, this.mainCamera);
+		// 	let hit = this.terrain.trace();
+		// 	if (hit)
+		// 	{
+		// 		let radius = 1;
+		// 		// tslint:disable-next-line:curly
+		// 		for (let x = -radius; x <= radius; x++)
+		// 		// tslint:disable-next-line:curly
+		// 		for (let y = -radius; y <= radius; y++)
+		// 		// tslint:disable-next-line:curly
+		// 		for (let z = -radius; z <= radius; z++)
+		// 		{
+		// 			this.terrain.setData(hit.point.x + x, hit.point.y + y, hit.point.z - z, 1);
+		// 		}
 
-				this.terrain.updateTerrain();
-			}
-			this.click = true;
-		}
-		else if (!Input.mouse.left)
-		{
-			this.click = false;
-		}
+		// 		this.terrain.updateTerrain();
+		// 	}
+		// 	this.click = true;
+		// }
+		// else if (!Input.mouse.left)
+		// {
+		// 	this.click = false;
+		// }
 
 		super.update();
 	}
