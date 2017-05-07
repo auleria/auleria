@@ -17,17 +17,20 @@ export class PlayerCharacter extends Character
 		this.playerID = playerid;
 	}
 
-	public initialize() : void {
+	public initialize() : void
+	{
 		let dworld = this.world as DebugWorld;
 		dworld.players.set(this.id, this);
 	}
 
-	public masterInitialize() : void {
+	public masterInitialize() : void
+	{
 		console.log("created player object with id", super.id);
 		this.transform.position = new THREE.Vector3(0, 0, 10);
 	}
 
-	public clientInitialize() : void {
+	public clientInitialize() : void
+	{
 		if (!this.isOwner)
 		{
 			Tween.simpleRecursive(this.transform.position, /^(x|y|z)$/);
@@ -42,7 +45,8 @@ export class PlayerCharacter extends Character
 		let material = new THREE.MeshStandardMaterial({color: 0xFFFFFF});
 		this.mesh = new THREE.Mesh(geometry, material);
 
-		if(this.isOwner) {
+		if(this.isOwner)
+		{
 			this.mesh.add(this.world.mainCamera);
 			this.world.mainCamera.position.x = -5;
 			this.world.mainCamera.position.z = 2;
@@ -53,10 +57,12 @@ export class PlayerCharacter extends Character
 		this.world.scene.add(this.mesh);
 	}
 
-	public update(timeScale : number) : void {
+	public update(timeScale : number) : void
+	{
 		super.update(timeScale);
 
-		if(this.isOwner) {
+		if(this.isOwner)
+		{
 			if(Input.keys.StrafeLeft || Input.keys.StrafeRight)
 			{
 				let euler = new THREE.Euler().setFromQuaternion(this.transform.rotation);
@@ -77,7 +83,8 @@ export class PlayerCharacter extends Character
 		}
 	}
 
-	public postUpdate () {
+	public postUpdate ()
+	{
 		super.postUpdate();
 		if (this.isOwner)
 		{
@@ -85,14 +92,16 @@ export class PlayerCharacter extends Character
 		}
 	}
 
-	public onDestroy() : void {
+	public onDestroy() : void
+	{
 		if (!this.isMaster)
 		{
 			this.world.scene.remove(this.mesh);
 		}
 	}
 
-	public writeToBuffer(buffer : ByteBuffer, fullSync : boolean) : boolean {
+	public writeToBuffer(buffer : ByteBuffer, fullSync : boolean) : boolean
+	{
 		if (this.isMaster || this.isOwner) {
 			this.transform.writePositionToBuffer(buffer);
 			this.transform.writeRotationToBuffer(buffer);
@@ -100,12 +109,15 @@ export class PlayerCharacter extends Character
 		}
 	}
 
-	public readFromBuffer(buffer : ByteBuffer, fullSync : boolean) {
-		if (this.isOwner && !this.isMaster) {
+	public readFromBuffer(buffer : ByteBuffer, fullSync : boolean)
+	{
+		if (this.isOwner && !this.isMaster)
+		{
 			buffer.moveForward(Transform.positionByteLength + Transform.rotationByteLength);
 		}
 
-		else {
+		else
+		{
 			this.transform.readPositionFromBuffer(buffer);
 			this.transform.readRotationFromBuffer(buffer);
 		}

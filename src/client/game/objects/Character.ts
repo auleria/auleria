@@ -14,31 +14,39 @@ export abstract class Character extends GameObject
 		super();
 	}
 
-	public initialize() : void {
+	public initialize() : void
+	{
 
 	}
 
-	public masterInitialize() : void {
+	public masterInitialize() : void
+	{
 
 	}
 
-	public clientInitialize() : void {
+	public clientInitialize() : void
+	{
 
 	}
 
-	public tick(timescale?: number) : void {
+	public tick(timescale?: number) : void
+	{
 
 	}
 
-	public update(timeScale : number) : void {
+	public update(timeScale : number) : void
+	{
+
 	}
 
-	public postUpdate() : void {
+	public postUpdate() : void
+	{
 		this.mesh.position.copy(this.transform.position);
 		this.mesh.rotation.copy(new THREE.Euler().setFromQuaternion(this.transform.rotation));
 	}
 
-	public move() : void {
+	public move() : void
+	{
 
 	}
 }
