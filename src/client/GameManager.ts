@@ -212,7 +212,8 @@ export class GameManager
 		StatsHandler.begin();
 		Profiler.begin("update");
 
-		let timescale = 1 / (this.lastTick - Date.now());
+		let timescale = 1 / (Date.now() - this.lastTick);
+		this.lastTick = Date.now();
 
 		Tween.update();
 		this.worlds.forEach(world => {
