@@ -9,6 +9,7 @@ export abstract class GameObject
 	private _id = Helper.generateID();
 	private _world : GameWorld;
 	private _isInitialized : boolean;
+	private _forward = new THREE.Vector3(1, 0, 0);
 	private isDestroyed = false;
 
 	public get id() { return this._id; }
@@ -16,6 +17,7 @@ export abstract class GameObject
 	public get isMaster() { return this._world.isMaster; }
 	public get isOwner() { return this._world.isOwner; }
 	public get isInitialized() { return this._isInitialized; }
+	public get forward() { return this._forward; }
 
 	@Helper.sealed
 	public transform = new Transform();
