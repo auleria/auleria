@@ -139,6 +139,7 @@ export abstract class GameWorld
 			this.byteBuffer.writeByte(NetworkCode.CREATE_OBJECT);
 			this.byteBuffer.writeString(object.constructor.name);
 			this.byteBuffer.writeId(object.id);
+			this.byteBuffer.writeString(object.owner);
 			this.writeObjectData(object, true);
 			object.externalInitialize();
 			this.writeObjectData(object, true);
@@ -176,6 +177,7 @@ export abstract class GameWorld
 			this.byteBuffer.writeByte(NetworkCode.CREATE_OBJECT);
 			this.byteBuffer.writeString(object.constructor.name);
 			this.byteBuffer.writeId(object.id);
+			this.byteBuffer.writeString(object.owner);
 			this.writeObjectData(object, true);
 			this.byteBuffer.writeByte(NetworkCode.OBJECT_INITIALIZATION);
 			this.byteBuffer.writeId(object.id);
@@ -304,6 +306,7 @@ export abstract class GameWorld
 	{
 		let typename = buffer.readString();
 		let id = buffer.readId();
+		let owner = buffer.readString();
 		let type = Classes.getClass(typename);
 		let object = this.gameObjects.get(id);
 		if (object)
@@ -313,6 +316,7 @@ export abstract class GameWorld
 		else
 		{
 			object = new type();
+			object.setOwner(owner);
 			object.preInitialize(this, id);
 			this.gameObjects.set(id, object);
 		}
