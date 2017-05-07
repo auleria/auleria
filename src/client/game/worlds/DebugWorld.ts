@@ -18,7 +18,7 @@ export class DebugWorld extends GameWorld
 
 	private t = 0;
 	private d = 0;
-	private terrain : QuadTreeTerrain;
+	public terrain : QuadTreeTerrain;
 
 	private click = false;
 
