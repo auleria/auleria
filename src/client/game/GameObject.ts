@@ -53,7 +53,7 @@ export abstract class GameObject
 
 	public tick(timescale?: number) : void { }
 
-	public update() : void { }
+	public update(timescale? : number) : void { }
 
 	public postUpdate() : void { }
 
