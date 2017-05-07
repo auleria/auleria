@@ -32,7 +32,9 @@ export class DebugWorld extends GameWorld
 		console.log("Debug World created, id is", this.id, "me is", this.me);
 
 		this.on("join", (data, playerid) => {
-			this.add(new PlayerCharacter(playerid));
+			let pc = new PlayerCharacter(playerid);
+			this.transferOwner(pc, playerid);
+			this.add(pc);
 		});
 
 		this.on("left", (data, playerid) => {
@@ -45,13 +47,9 @@ export class DebugWorld extends GameWorld
 	public clientInitialize()
 	{
 		console.log("DebugWorld created on client with id", this.id);
-		this.mainCamera.position.z = 60;
-		this.mainCamera.position.y = -60;
 
 		let hemiLight = new THREE.HemisphereLight( 0xddeeff, 0x0f0e0d, 2 );
 		this.scene.add( hemiLight );
-
-		this.mainCamera.lookAt(new THREE.Vector3(0,0,0));
 
 		let terrain = this.add(new QuadTreeTerrain());
 

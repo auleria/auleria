@@ -29,12 +29,18 @@ export class PlayerCharacter extends Character
 		Tween.simpleRecursive(this.transform.position, /^(x|y|z)$/);
 
 		this.transform.position = new THREE.Vector3(0, 0, 10);
+		this.movementSpeed = 3;
 
 		let geometry = new THREE.BoxGeometry(1, 1, 2);
 		let material = new THREE.MeshStandardMaterial({color: 0xFFFFFF});
 		this.mesh = new THREE.Mesh(geometry, material);
 
-		this.movementSpeed = 3;
+		if(this.isOwner) {
+			this.mesh.add(this.world.mainCamera);
+			this.world.mainCamera.position.x = -5;
+			this.world.mainCamera.position.z = 2;
+			this.world.mainCamera.lookAt(new THREE.Vector3(5, 0, -2));
+		}
 
 		this.mesh.position.copy(this.transform.position);
 		this.world.scene.add(this.mesh);
