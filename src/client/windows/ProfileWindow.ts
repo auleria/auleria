@@ -1,6 +1,5 @@
 
 import { ExternalWindow } from "./ExternalWindow";
-import * as D3 from "d3";
 import { ISection } from "../Profiler";
 
 export class ProfileWindow extends ExternalWindow
