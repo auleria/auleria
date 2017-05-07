@@ -14,7 +14,6 @@ import { Input } from "./Input";
 import { StatsHandler } from "./StatsHandler";
 import { Profiler } from "./Profiler";
 import { ProfileWindow } from "./windows/ProfileWindow";
-import { SimpleWorker } from "./SimpleWorker";
 
 declare let Peer : any;
 let t = THREE;
@@ -38,13 +37,6 @@ async function main()
 		StatsHandler.initialize();
 		
 		Commands.register("profile", () => new ProfileWindow(Profiler.top.children.get("update")));
-		
-		function named()
-		{
-			console.log("this is a named function");
-		}
-
-		SimpleWorker.execute(named);
 
 		if (host)
 		{

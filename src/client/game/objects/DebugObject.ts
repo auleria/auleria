@@ -3,6 +3,7 @@ import { ByteBuffer } from "../../ByteBuffer";
 import { Classes } from "../../Classes";
 import { Tween } from "../../Tween";
 import { DebugWorld } from "../worlds/DebugWorld";
+import { Input } from "../../Input";
 
 @Classes.register
 export class DebugObject extends GameObject
@@ -32,7 +33,7 @@ export class DebugObject extends GameObject
 		}
 		else
 		{
-			Tween.simple(this, "x");
+			//Tween.simple(this, "x");
 
 			let geometry = new THREE.BoxGeometry(1, 1, 1);
 			this.boxMesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({color: 0xffffff}));
@@ -44,33 +45,56 @@ export class DebugObject extends GameObject
 
 	public writeToBuffer(buffer : ByteBuffer, forced : boolean)
 	{
-		if (this.isMaster)
+		if (this.isMaster || this.isOwner)
 		{
-			if (forced) {
-				buffer.writeFloat(this.y);
-			}
-			buffer.writeFloat(Math.sin(this.x));
+			buffer.writeFloat(this.y);
+			buffer.writeFloat(this.x);
 			return true;
 		}
 	}
 
-	public readFromBuffer(buffer : ByteBuffer, forced : boolean = false)
+	public readFromBuffer(buffer : ByteBuffer, forced : boolean)
 	{
-		if (!this.isMaster)
+		if (this.isMaster || !this.isOwner)
 		{
-			if (forced) {
-				this.y = buffer.readFloat();
-			}
+			this.y = buffer.readFloat();
 			this.x = buffer.readFloat();
+			return;
+		}
+
+		if (this.isOwner)
+		{
+			buffer.readFloat();
+			buffer.readFloat();
 		}
 	}
 
 	public tick(timescale : number): void {
-		this.x += Math.PI * timescale;
+		
 	}
 
 	public update(): void {
+		if (this.isOwner)
+		{
+			if (Input.keys.StrafeLeft)
+			{
+				this.x--;
+			}
+			if (Input.keys.StrafeRight)
+			{
+				this.x++;
+			}
+			if (Input.keys.Forward)
+			{
+				this.y++;
+			}
+			if (Input.keys.Backward)
+			{
+				this.y--;
+			}
+		}
 		this.boxMesh.position.x = this.x;
+		this.boxMesh.position.y = this.y;
 	}
 
 	public onDestroy(): void {
