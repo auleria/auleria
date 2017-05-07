@@ -17,6 +17,7 @@ export abstract class GameObject
 	public get isMaster() { return this._world.isMaster; }
 	public get isOwner() { return this._owner === this.world.me; }
 	public get isInitialized() { return this._isInitialized; }
+	public get owner() { return this._owner; }
 
 	@Helper.sealed
 	public transform = new Transform();
