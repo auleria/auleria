@@ -11,7 +11,13 @@ export class Input
 		TurnRight: "",
 		StrafeLeft: "a",
 		StrafeRight: "d",
-		Jump: " "
+		Jump: " ",
+		Menu: "Escape",
+		Confirm: "Enter",
+		Up: "ArrowUp",
+		Down: "ArrowDown",
+		Left: "ArrowLeft",
+		Right: "ArrowRight"
 	};
 
 	public static keys = {
@@ -21,7 +27,13 @@ export class Input
 		TurnRight: false,
 		StrafeLeft: false,
 		StrafeRight: false,
-		Jump: false
+		Jump: false,
+		Menu: false,
+		Confirm: false,
+		Up: false,
+		Down: false,
+		Left: false,
+		Right: false
 	};
 
 	public static get mouse() { return {x: Input._mouse.x, y: Input._mouse.y, left: Input._mouse.left, right: Input._mouse.right, middle: Input._mouse.middle, scroll: Input._mouse.scroll}; }
