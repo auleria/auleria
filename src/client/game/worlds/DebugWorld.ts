@@ -1,6 +1,6 @@
 
 import { GameWorld } from "../GameWorld";
-import { DebugObject } from "../objects/DebugObject";
+import { PlayerCharacter } from "../objects/PlayerCharacter";
 import { Remote } from "../../Remote";
 import { Classes } from "../../Classes";
 import { NetworkCode } from "../../NetworkCode";
@@ -14,7 +14,7 @@ export class DebugWorld extends GameWorld
 	private point : THREE.Mesh;
 	private raycaster = new THREE.Raycaster();
 
-	public players = new Map<string, DebugObject>();
+	public players = new Map<string, PlayerCharacter>();
 
 	private t = 0;
 	private d = 0;
@@ -24,35 +24,34 @@ export class DebugWorld extends GameWorld
 
 	public initialize()
 	{
-		if (this.isMaster)
-		{
-			console.log("Debug World created, id is", this.id, "me is", this.me);
 
-			this.on("join", (data, playerid) => {
-				this.add(new DebugObject(playerid));
-			});
+	}
 
-			this.on("left", (data, playerid) => {
-				let object = this.players.get(playerid);
-				this.players.delete(playerid);
-				this.destroy(object);
-			});
-		}
-		else
-		{
-			console.log("DebugWorld created on client with id", this.id);
-			this.mainCamera.position.z = 60;
-			this.mainCamera.position.y = -60;
+	public masterInitialize()
+	{
+		console.log("Debug World created, id is", this.id, "me is", this.me);
 
-			let hemiLight = new THREE.HemisphereLight( 0xddeeff, 0x0f0e0d, 2 );
-			this.scene.add( hemiLight );
+		this.on("join", (data, playerid) => {
+			let pc = new PlayerCharacter(playerid);
+			this.transferOwner(pc, playerid);
+			this.players.set(playerid, pc);
+			this.add(pc);
+		});
 
-			this.mainCamera.lookAt(new THREE.Vector3(0,0,0));
-		}
+		this.on("left", (data, playerid) => {
+			let object = this.players.get(playerid);
+			this.players.delete(playerid);
+			this.destroy(object);
+		});
 	}
 
 	public clientInitialize()
 	{
+		console.log("DebugWorld created on client with id", this.id);
+
+		let hemiLight = new THREE.HemisphereLight( 0xddeeff, 0x0f0e0d, 2 );
+		this.scene.add( hemiLight );
+
 		let terrain = this.add(new QuadTreeTerrain());
 
 		this.point = new THREE.Mesh(new THREE.SphereGeometry(0.2), new THREE.MeshBasicMaterial({color: 0xffffff}));

@@ -9,6 +9,7 @@ export abstract class GameObject
 	private _id = Helper.generateID();
 	private _world : GameWorld;
 	private _isInitialized : boolean;
+	private _forward = new THREE.Vector3(1, 0, 0);
 	private isDestroyed = false;
 	private _owner : string = null;
 
@@ -17,6 +18,7 @@ export abstract class GameObject
 	public get isMaster() { return this._world.isMaster; }
 	public get isOwner() { return this._owner === this.world.me; }
 	public get isInitialized() { return this._isInitialized; }
+	public get forward() { return this._forward; }
 	public get owner() { return this._owner; }
 
 	@Helper.sealed
@@ -70,12 +72,12 @@ export abstract class GameObject
 
 	public onDestroy() : void { }
 
-	public writeToBuffer(bb : ByteBuffer, forced : boolean = false ) : boolean
+	public writeToBuffer(bb : ByteBuffer, fullSync : boolean = false ) : boolean
 	{
 		return false;
 	}
 
-	public readFromBuffer(bb : ByteBuffer, forced : boolean = false)
+	public readFromBuffer(bb : ByteBuffer, fullSync : boolean = false)
 	{
 		return;
 	}
