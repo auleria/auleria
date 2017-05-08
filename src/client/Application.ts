@@ -12,18 +12,22 @@ import { Tween } from "./Tween";
 import { Commands } from "./Commands";
 import { Input } from "./Input";
 import { StatsHandler } from "./StatsHandler";
+import { Profiler } from "./Profiler";
+import { ProfileWindow } from "./windows/ProfileWindow";
 
 declare let Peer : any;
 let t = THREE;
 main();
 async function main()
 {
+	Profiler.initialize();
 	if (isWorker())
 	{
 		let worker = new GameWorker();
 	}
 	else
 	{
+		//var uintExt = gl.getExtension("OES_element_index_uint");
 		let id = getHashParameter("id");
 		let host = getHashParameter("host");
 
@@ -31,6 +35,8 @@ async function main()
 		await gameManager.prepareNetwork(id);
 		Input.initialize();
 		StatsHandler.initialize();
+		
+		Commands.register("profile", () => new ProfileWindow(Profiler.top.children.get("update")));
 
 		if (host)
 		{

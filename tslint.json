@@ -4,7 +4,7 @@
 		"no-unused-variable": false,
 		"no-duplicate-variable": true,
 		"no-duplicate-key": true,
-		"no-var-keyword": true,
+		"no-var-keyword": false,
 		"no-invalid-this": true,
 		"no-eval": true,
 		"no-unnecessary-initializer": true,

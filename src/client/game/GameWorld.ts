@@ -15,7 +15,7 @@ export abstract class GameWorld
 	private _me : string;
 
 	public get isMaster() { return this._isMaster; }
-	public get isOwner() { return this._isOwner; }
+	public get isOwner() { return this.owner === this.me; }
 	public get id() { return this._id; }
 	public get owner() { return this._owner; }
 	public get me() { return this._me; }
@@ -72,12 +72,12 @@ export abstract class GameWorld
 		}
 	}
 
-	public update()
+	public update(timescale : number)
 	{
 		for (let kvp of this.gameObjects)
 		{
 			let object = kvp[1];
-			object.update();
+			object.update(timescale);
 		}
 	}
 
@@ -139,6 +139,7 @@ export abstract class GameWorld
 			this.byteBuffer.writeByte(NetworkCode.CREATE_OBJECT);
 			this.byteBuffer.writeString(object.constructor.name);
 			this.byteBuffer.writeId(object.id);
+			this.byteBuffer.writeString(object.owner);
 			this.writeObjectData(object, true);
 			object.externalInitialize();
 			this.writeObjectData(object, true);
@@ -176,6 +177,7 @@ export abstract class GameWorld
 			this.byteBuffer.writeByte(NetworkCode.CREATE_OBJECT);
 			this.byteBuffer.writeString(object.constructor.name);
 			this.byteBuffer.writeId(object.id);
+			this.byteBuffer.writeString(object.owner);
 			this.writeObjectData(object, true);
 			this.byteBuffer.writeByte(NetworkCode.OBJECT_INITIALIZATION);
 			this.byteBuffer.writeId(object.id);
@@ -207,6 +209,9 @@ export abstract class GameWorld
 				case NetworkCode.OBJECT_INITIALIZATION:
 					this.initializeObjectFromBuffer(buffer);
 					break;
+				case NetworkCode.OBJECT_TRANSFER_OWNERSHIP:
+					this.setOwner(buffer);
+					break;
 				case NetworkCode.WORLD_EVENT:
 					this.handleEvent(buffer);
 					break;
@@ -216,6 +221,26 @@ export abstract class GameWorld
 					console.log("unknown event id", eventid, this.isMaster);
 			}
 		}
+	}
+
+	private setOwner(buffer : ByteBuffer)
+	{
+		let id = buffer.readId();
+		let newOwner = buffer.readString();
+
+		let object = this.gameObjects.get(id);
+		if (object)
+		{
+			object.setOwner(newOwner);
+		}
+	}
+
+	public transferOwner(object : GameObject, newOwner : string)
+	{
+		object.setOwner(newOwner);
+		this.byteBuffer.writeByte(NetworkCode.OBJECT_TRANSFER_OWNERSHIP);
+		this.byteBuffer.writeId(object.id);
+		this.byteBuffer.writeString(newOwner);
 	}
 
 	private readObjectData(buffer : ByteBuffer)
@@ -281,6 +306,7 @@ export abstract class GameWorld
 	{
 		let typename = buffer.readString();
 		let id = buffer.readId();
+		let owner = buffer.readString();
 		let type = Classes.getClass(typename);
 		let object = this.gameObjects.get(id);
 		if (object)
@@ -290,6 +316,7 @@ export abstract class GameWorld
 		else
 		{
 			object = new type();
+			object.setOwner(owner);
 			object.preInitialize(this, id);
 			this.gameObjects.set(id, object);
 		}

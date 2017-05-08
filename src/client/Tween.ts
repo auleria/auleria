@@ -40,7 +40,7 @@ export class Tween
 		if (!original) { original = target; }
 		for (let prop in target)
 		{
-			if (target[prop] === original && pattern.test(prop)) { continue; }
+			if (target[prop] === original || !pattern.test(prop)) { continue; }
 
 			if (typeof target[prop] === "object")
 			{

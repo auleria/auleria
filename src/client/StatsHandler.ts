@@ -7,14 +7,21 @@ export class StatsHandler
 		this.stats = new Stats();
 		this.stats.showPanel(0);
 		document.body.appendChild(this.stats.dom);
-
-		this.stats.begin();
-		requestAnimationFrame(() => this.handleFrame());
 	}
 
-	private static handleFrame () {
-		requestAnimationFrame(() => this.handleFrame());
-		this.stats.end();
-		this.stats.begin();
+	public static begin()
+	{
+		if (this.stats)
+		{
+			this.stats.begin();
+		}
+	}
+
+	public static end()
+	{
+		if (this.stats)
+		{
+			this.stats.end();
+		}
 	}
 }

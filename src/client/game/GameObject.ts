@@ -10,12 +10,14 @@ export abstract class GameObject
 	private _world : GameWorld;
 	private _isInitialized : boolean;
 	private isDestroyed = false;
+	private _owner : string = null;
 
 	public get id() { return this._id; }
 	public get world() { return this._world; }
 	public get isMaster() { return this._world.isMaster; }
-	public get isOwner() { return this._world.isOwner; }
+	public get isOwner() { return this._owner === this.world.me; }
 	public get isInitialized() { return this._isInitialized; }
+	public get owner() { return this._owner; }
 
 	@Helper.sealed
 	public transform = new Transform();
@@ -29,6 +31,10 @@ export abstract class GameObject
 	{
 		this._id = id || this._id;
 		this._world = world;
+		if (this._owner === null)
+		{
+			this._owner = world.owner;
+		}
 	}
 
 	public externalInitialize() : void
@@ -45,6 +51,11 @@ export abstract class GameObject
 		this._isInitialized = true;
 	}
 
+	public setOwner(newOwner : string)
+	{
+		this._owner = newOwner;
+	}
+
 	public initialize() : void { }
 
 	public masterInitialize() : void { }
@@ -53,7 +64,7 @@ export abstract class GameObject
 
 	public tick(timescale?: number) : void { }
 
-	public update() : void { }
+	public update(timescale? : number) : void { }
 
 	public postUpdate() : void { }
 

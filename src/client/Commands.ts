@@ -13,7 +13,7 @@ export class Commands
 		let command = Commands.commands.get(name);
 		if (command)
 		{
-			command(...args);
+			return command(...args);
 		}
 		else
 		{
@@ -25,7 +25,7 @@ export class Commands
 // tslint:disable-next-line:curly
 // tslint:disable-next-line:no-invalid-this
 if (!isWorker())
-	(window as any)["do"] = Commands.do;
+	(window as any)["c"] = Commands.do;
 
 function isWorker()
 {
