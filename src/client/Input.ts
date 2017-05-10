@@ -11,6 +11,7 @@ export class Input
 		TurnRight: "",
 		StrafeLeft: "a",
 		StrafeRight: "d",
+		Sprint: "Shift",
 		Jump: " ",
 		Menu: "Escape",
 		Confirm: "Enter",
@@ -27,6 +28,7 @@ export class Input
 		TurnRight: false,
 		StrafeLeft: false,
 		StrafeRight: false,
+		Sprint: false,
 		Jump: false,
 		Menu: false,
 		Confirm: false,
@@ -70,6 +72,7 @@ export class Input
 
 	private static handleKeyDown(event : KeyboardEvent)
 	{
+		let charCode = event.charCode || event.keyCode || event.which;
 		for (let input in this.keymap)
 		{
 			let key = (this.keymap as any)[input] as string;
