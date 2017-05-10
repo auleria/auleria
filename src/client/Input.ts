@@ -22,20 +22,20 @@ export class Input
 	};
 
 	public static keys = {
-		Forward: false,
-		Backward: false,
-		TurnLeft: false,
-		TurnRight: false,
-		StrafeLeft: false,
-		StrafeRight: false,
-		Sprint: false,
-		Jump: false,
-		Menu: false,
-		Confirm: false,
-		Up: false,
-		Down: false,
-		Left: false,
-		Right: false
+		Forward: 0,
+		Backward: 0,
+		TurnLeft: 0,
+		TurnRight: 0,
+		StrafeLeft: 0,
+		StrafeRight: 0,
+		Sprint: 0,
+		Jump: 0,
+		Menu: 0,
+		Confirm: 0,
+		Up: 0,
+		Down: 0,
+		Left: 0,
+		Right: 0
 	};
 
 	public static get mouse() { return {x: Input._mouse.x, y: Input._mouse.y, left: Input._mouse.left, right: Input._mouse.right, middle: Input._mouse.middle, scroll: Input._mouse.scroll}; }
@@ -76,8 +76,9 @@ export class Input
 		for (let input in this.keymap)
 		{
 			let key = (this.keymap as any)[input] as string;
-			if (event.key === key)
+			if (event.key.toLowerCase() === key.toLowerCase())
 			{
+				event.preventDefault();
 				(this.keys as any)[input] = true;
 				break;
 			}
@@ -89,8 +90,9 @@ export class Input
 		for (let input in this.keymap)
 		{
 			let key = (this.keymap as any)[input] as string;
-			if (event.key === key)
+			if (event.key.toLowerCase() === key.toLowerCase())
 			{
+				event.preventDefault();
 				(this.keys as any)[input] = false;
 				break;
 			}
