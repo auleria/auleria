@@ -40,13 +40,13 @@ export class Tween
 		if (!original) { original = target; }
 		for (let prop in target)
 		{
-			if (target[prop] === original || !pattern.test(prop)) { continue; }
+			if (target[prop] === original) { continue; }
 
 			if (typeof target[prop] === "object")
 			{
 				Tween.simpleRecursive(target[prop], pattern, original);
 			}
-			else
+			else if (pattern.test(prop))
 			{
 				Tween.simple(target, prop);
 			}

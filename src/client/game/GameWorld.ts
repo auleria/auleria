@@ -26,7 +26,7 @@ export abstract class GameWorld
 
 	private gameObjects = new Map<string, GameObject>();
 	private _scene : THREE.Scene;
-	protected mainCamera : THREE.PerspectiveCamera;
+	public mainCamera : THREE.PerspectiveCamera;
 	private renderer : THREE.Renderer;
 
 	private eventListeners = new Map<string, Function>();
@@ -43,6 +43,7 @@ export abstract class GameWorld
 		{
 			this._scene = new THREE.Scene();
 			this.mainCamera = new THREE.PerspectiveCamera(FOV, 1, 0.1, 1000);
+			this.mainCamera.up = new THREE.Vector3(0, 0, 1);
 		}
 	}
 
@@ -247,11 +248,11 @@ export abstract class GameWorld
 	{
 		let id = buffer.readId();
 		let size = buffer.readInt32();
-		let forced = buffer.readByte() === 1 ? true : false;
+		let fullSync = buffer.readByte() === 1 ? true : false;
 		let object = this.gameObjects.get(id);
 		if (object)
 		{
-			object.readFromBuffer(buffer, forced);
+			object.readFromBuffer(buffer, fullSync);
 		}
 		else
 		{
@@ -279,12 +280,12 @@ export abstract class GameWorld
 		}
 	}
 
-	private writeObjectData(object : GameObject, forced : boolean)
+	private writeObjectData(object : GameObject, fullSync : boolean)
 	{
 		let prevPos = this.byteBuffer.position;
 		let objectstart = prevPos + 1 + Helper.ID_SIZE + 1 + 4;
 		this.byteBuffer.seek(objectstart);
-		if ( object.writeToBuffer(this.byteBuffer, forced) )
+		if ( object.writeToBuffer(this.byteBuffer, fullSync) )
 		{
 			let curPos = this.byteBuffer.position;
 			let size = curPos - objectstart;
@@ -292,7 +293,7 @@ export abstract class GameWorld
 			this.byteBuffer.writeByte(NetworkCode.OBJECT_DATA);
 			this.byteBuffer.writeId(object.id);
 			this.byteBuffer.writeInt32(size);
-			this.byteBuffer.writeByte(forced ? 1 : 0);
+			this.byteBuffer.writeByte(fullSync ? 1 : 0);
 			this.byteBuffer.seek(curPos);
 
 			return true;

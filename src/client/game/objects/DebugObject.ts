@@ -41,12 +41,9 @@ export class DebugObject extends GameObject
 			this.boxMesh.position.y = this.y;
 			this.world.scene.add(this.boxMesh);
 		}
-
-		let dworld = this.world as DebugWorld;
-		dworld.players.set(this.playerID, this);
 	}
 
-	public writeToBuffer(buffer : ByteBuffer, forced : boolean)
+	public writeToBuffer(buffer : ByteBuffer, fullSync : boolean)
 	{
 		if (this.isMaster || this.isOwner)
 		{
@@ -56,7 +53,7 @@ export class DebugObject extends GameObject
 		}
 	}
 
-	public readFromBuffer(buffer : ByteBuffer, forced : boolean)
+	public readFromBuffer(buffer : ByteBuffer, fullSync : boolean)
 	{
 		if (this.isMaster || !this.isOwner)
 		{
