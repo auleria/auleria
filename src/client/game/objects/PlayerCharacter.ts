@@ -75,7 +75,9 @@ export class PlayerCharacter extends Character
 				velocity.applyQuaternion(this.transform.rotation);
 				velocity.normalize();
 
-				velocity.multiplyScalar((Input.keys.Forward) ? this.movementSpeed * timeScale : -this.movementSpeed * timeScale);
+				let speed = this.movementSpeed * timeScale * (Input.keys.Sprint ? 10 : 1);
+
+				velocity.multiplyScalar((Input.keys.Forward) ? speed : -speed);
 
 				this.transform.position.add(velocity);
 			}
