@@ -74,5 +74,7 @@ export class DebugWorld extends GameWorld
 	public update(tickrate : number)
 	{
 		super.update(tickrate);
+		this.t += 0.01;
+		this.terrain.poi.x = Math.cos(this.t) * 2000;
 	}
 }

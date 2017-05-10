@@ -24,3 +24,4 @@ export class Simplex
 		return this.simplex.noise4D(x, y, z, w);
 	}
 }
+
