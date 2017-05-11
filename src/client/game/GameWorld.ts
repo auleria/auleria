@@ -42,7 +42,7 @@ export abstract class GameWorld
 		if (!isMaster)
 		{
 			this._scene = new THREE.Scene();
-			this.mainCamera = new THREE.PerspectiveCamera(FOV, 1, 0.1, 1000);
+			this.mainCamera = new THREE.PerspectiveCamera(FOV, 1, 0.1, 6000);
 			this.mainCamera.up = new THREE.Vector3(0, 0, 1);
 		}
 	}
