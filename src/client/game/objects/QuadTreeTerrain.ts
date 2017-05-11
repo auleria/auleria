@@ -56,6 +56,7 @@ export class QuadTreeTerrain extends GameObject
 
 	public getHeightAt(x : number, y : number)
 	{
+		// use terrain height calculation from chunk instead.
 		let ray = new THREE.Raycaster(new THREE.Vector3(x, y, 1000), new THREE.Vector3(0,0,-1), 1, 2000);
 		let hits = ray.intersectObjects(this.group.children);
 		let hit = hits[0];
