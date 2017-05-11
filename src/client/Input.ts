@@ -132,7 +132,7 @@ export class Input
 					let input = (Input.gamepadmap as any)[inputName];
 					if (input.axis !== undefined)
 					{
-						if (input.test(gamepad.axes[input.axis]))
+						if (Math.abs(gamepad.axes[input.axis]) > 0.01 && input.test(gamepad.axes[input.axis]))
 						{
 							(this.keys as any)[inputName] = input.transform ? input.transform(gamepad.axes[input.axis]) : gamepad.axes[input.axis];
 						}
