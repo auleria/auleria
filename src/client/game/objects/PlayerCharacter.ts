@@ -62,6 +62,7 @@ export class PlayerCharacter extends Character
 
 		if(this.isOwner)
 		{
+			this.transform.position.z = (this.world as DebugWorld).terrain.getHeightAt(this.transform.position.x, this.transform.position.y);
 			if(Input.keys.StrafeLeft || Input.keys.StrafeRight)
 			{
 				let euler = new THREE.Euler().setFromQuaternion(this.transform.rotation);
