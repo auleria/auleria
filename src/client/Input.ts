@@ -7,8 +7,8 @@ export class Input
 	private static keymap = {
 		Forward: "w",
 		Backward: "s",
-		TurnLeft: "",
-		TurnRight: "",
+		TurnLeft: "ArrowLeft",
+		TurnRight: "ArrowRight",
 		StrafeLeft: "a",
 		StrafeRight: "d",
 		Sprint: "Shift",
@@ -20,6 +20,9 @@ export class Input
 		Left: "ArrowLeft",
 		Right: "ArrowRight"
 	};
+
+	private static gamepad : Gamepad;
+	private static gamepadTimestamp : number = 0;
 
 	public static keys = {
 		Forward: 0,
@@ -38,10 +41,56 @@ export class Input
 		Right: 0
 	};
 
+	private static gamepadmap = {
+		Forward: {
+			axis: 1,
+			test: (n : number) => n < 0,
+			transform: (n : number) => -n
+		},
+		Backward: {
+			axis: 1,
+			test: (n : number) => n > 0
+		},
+		StrafeRight: {
+			axis: 0,
+			test: (n : number) => n > 0
+		},
+		StrafeLeft: {
+			axis: 0,
+			test: (n : number) => n < 0,
+			transform: (n : number) => -n
+		},
+		TurnRight: {
+			axis: 2,
+			test: (n : number) => n > 0
+		},
+		TurnLeft: {
+			axis: 2,
+			test: (n : number) => n < 0,
+			transform: (n : number) => -n
+		},
+		Sprint: {
+			button: 7
+		}
+	};
+
+	private static gamepads = new Array<Gamepad>();
+
 	public static get mouse() { return {x: Input._mouse.x, y: Input._mouse.y, left: Input._mouse.left, right: Input._mouse.right, middle: Input._mouse.middle, scroll: Input._mouse.scroll}; }
 
 	public static initialize()
 	{
+		window.addEventListener("gamepadconnected", (e : GamepadEvent) => {
+			Input.gamepads.push(e.gamepad);
+			if (e.gamepad !== null && /Xbox/.test(e.gamepad.id))
+			{
+				this.gamepad = e.gamepad;
+			}
+			console.log("Gamepad connected",  e.gamepad.id);
+		});
+
+		Input.updateGamepads();
+
 		window.addEventListener("mousemove", (e) => {
 			Input._mouse.x = e.clientX;
 			Input._mouse.y = e.clientY;
@@ -70,6 +119,39 @@ export class Input
 		window.addEventListener("keyup", (e) => this.handleKeyUp(e));
 	}
 
+	private static updateGamepads()
+	{
+		let gps = Array.from(navigator.getGamepads());
+		let gamepad = gps.find((gp) => gp !== null && /Xbox/.test(gp.id));
+		if (gamepad)
+		{
+			if (this.gamepadTimestamp !== gamepad.timestamp)
+			{
+				for (var inputName in Input.gamepadmap)
+				{
+					let input = (Input.gamepadmap as any)[inputName];
+					if (input.axis !== undefined)
+					{
+						if (input.test(gamepad.axes[input.axis]))
+						{
+							(this.keys as any)[inputName] = input.transform ? input.transform(gamepad.axes[input.axis]) : gamepad.axes[input.axis];
+						}
+						else
+						{
+							(this.keys as any)[inputName] = 0;
+						}
+					}
+					else if (input.button !== undefined)
+					{
+						(this.keys as any)[inputName] = gamepad.buttons[input.button].value;
+					}
+				}
+			}
+			this.gamepadTimestamp = gamepad.timestamp;
+		}
+		requestAnimationFrame(() => Input.updateGamepads());
+	}
+
 	private static handleKeyDown(event : KeyboardEvent)
 	{
 		let charCode = event.charCode || event.keyCode || event.which;
@@ -79,7 +161,7 @@ export class Input
 			if (event.key.toLowerCase() === key.toLowerCase())
 			{
 				event.preventDefault();
-				(this.keys as any)[input] = true;
+				(this.keys as any)[input] = 1;
 				break;
 			}
 		}
@@ -93,7 +175,7 @@ export class Input
 			if (event.key.toLowerCase() === key.toLowerCase())
 			{
 				event.preventDefault();
-				(this.keys as any)[input] = false;
+				(this.keys as any)[input] = 0;
 				break;
 			}
 		}
