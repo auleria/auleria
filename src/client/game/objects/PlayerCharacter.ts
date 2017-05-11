@@ -56,32 +56,27 @@ export class PlayerCharacter extends Character
 		this.world.scene.add(this.mesh);
 	}
 
-	public update(timeScale : number) : void
+	public update(timescale : number) : void
 	{
-		super.update(timeScale);
+		super.update(timescale);
 
 		if(this.isOwner)
 		{
+			let euler = new THREE.Euler().setFromQuaternion(this.transform.rotation);
+			euler.z -= (Input.keys.TurnRight - Input.keys.TurnLeft) * timescale;
+			this.transform.rotation.setFromEuler(euler);
+
+			let velocity = new THREE.Vector3().copy(this.forward);
+			velocity.multiplyScalar(Input.keys.Forward - Input.keys.Backward);
+			velocity.addScaledVector(new THREE.Vector3(0, 1, 0), Input.keys.StrafeLeft - Input.keys.StrafeRight);
+			velocity.applyQuaternion(this.transform.rotation);
+
+			let speed = this.movementSpeed * timescale * (Input.keys.Sprint ? 10 : 1);
+
+			velocity.multiplyScalar(speed);
+
+			this.transform.position.add(velocity);
 			this.transform.position.z = (this.world as DebugWorld).terrain.getHeightAt(this.transform.position.x, this.transform.position.y);
-			if(Input.keys.StrafeLeft || Input.keys.StrafeRight)
-			{
-				let euler = new THREE.Euler().setFromQuaternion(this.transform.rotation);
-				euler.z += (Input.keys.StrafeRight) ? -0.5 * timeScale : 0.5 * timeScale;
-				this.transform.rotation.setFromEuler(euler);
-			}
-
-			if(Input.keys.Forward || Input.keys.Backward)
-			{
-				let velocity = new THREE.Vector3().copy(this.forward);
-				velocity.applyQuaternion(this.transform.rotation);
-				velocity.normalize();
-
-				let speed = this.movementSpeed * timeScale * (Input.keys.Sprint ? 10 : 1);
-
-				velocity.multiplyScalar((Input.keys.Forward) ? speed : -speed);
-
-				this.transform.position.add(velocity);
-			}
 		}
 	}
 
