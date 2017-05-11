@@ -20,12 +20,14 @@ export class QuadTreeTerrain extends GameObject
 	public octaves = 10;
 	public simplex : Simplex;
 	public material : THREE.Material;
+	public group : THREE.Group;
 
 	public clientInitialize()
 	{
 		this.tree = new Map2<number, number, Quad>();
 		let radius = 3;
 		this.quadSize = 1024;
+		this.group = new THREE.Group();
 		for (var y = 0; y < radius; y++)
 		{
 			for (var x = 0; x < radius; x++)
@@ -49,11 +51,20 @@ export class QuadTreeTerrain extends GameObject
 
 		this.simplex = new Simplex(new Alea(this.world.id));
 		this.material = new THREE.MeshStandardMaterial({color: 0xaaff99});
+		this.world.scene.add(this.group);
 	}
 
 	public getHeightAt(x : number, y : number)
 	{
+		let ray = new THREE.Raycaster(new THREE.Vector3(x, y, 1000), new THREE.Vector3(0,0,-1), 1, 2000);
+		let hits = ray.intersectObjects(this.group.children);
+		let hit = hits[0];
+		if (hit)
+		{
+			return hit.point.z;
+		}
 		
+		return 0;
 	}
 
 	public update()
@@ -234,12 +245,12 @@ class Chunk
 		this.mesh.position.x = this.x;
 		this.mesh.position.y = this.y;
 
-		this.terrain.world.scene.add(this.mesh);
+		this.terrain.group.add(this.mesh);
 	}
 
 	public dispose()
 	{
-		this.terrain.world.scene.remove(this.mesh);
+		this.terrain.group.remove(this.mesh);
 		this.mesh.geometry.dispose();
 		this.mesh = null;
 		this.geometry = null;
