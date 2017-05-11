@@ -38,6 +38,7 @@ export class GameManager
 		this.mainRenderer = new THREE.WebGLRenderer({antialias: true});
 		this.mainRenderer.shadowMap.enabled = true;
 		this.mainRenderer.setSize(window.innerWidth, window.innerHeight);
+		this.mainRenderer.setClearColor(0xddeeff);
 		window.addEventListener("resize", () => {
 			this.mainRenderer.setSize(window.innerWidth, window.innerHeight);
 			(this.mainRenderer as any).needsUpdate = true;
