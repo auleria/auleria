@@ -68,6 +68,8 @@ export class DebugWorld extends GameWorld
 		this.point.add(line);
 		//this.scene.add(line);
 
+		this.scene.fog = new THREE.Fog(0xddeeff, 500, 2000);
+
 		this.terrain = terrain;
 	}
 
