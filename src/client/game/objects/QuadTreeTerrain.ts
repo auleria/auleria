@@ -64,7 +64,6 @@ export class QuadTreeTerrain extends GameObject
 		{
 			return hit.point.z;
 		}
-		
 		return 0;
 	}
 
@@ -75,8 +74,8 @@ export class QuadTreeTerrain extends GameObject
 
 	public handleQuad(quad : Quad)
 	{
-		let dist = quad.position.clone().addScalar(quad.size / 2).distanceTo(this.poi);
-		if (dist < (this.quadSize * 3) >> quad.depth && quad.depth < 5)
+		let dist = quad.position.clone().setZ(0).addScalar(quad.size / 2).distanceTo(this.poi.clone().setZ(0));
+		if (dist < (this.quadSize * 1.5) >> quad.depth && quad.depth < 5)
 		{
 			if (quad.value)
 			{
