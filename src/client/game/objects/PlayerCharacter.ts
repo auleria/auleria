@@ -11,6 +11,8 @@ export class PlayerCharacter extends Character
 {
 	public playerID : string;
 
+	private velocity : THREE.Vector3;
+
 	constructor(playerid : string)
 	{
 		super();
@@ -21,6 +23,7 @@ export class PlayerCharacter extends Character
 	{
 		let dworld = this.world as DebugWorld;
 		dworld.players.set(this.id, this);
+		this.velocity = new THREE.Vector3();
 	}
 
 	public masterInitialize() : void
@@ -62,6 +65,10 @@ export class PlayerCharacter extends Character
 
 		if(this.isOwner)
 		{
+			if (Input.keys.Menu && Input.keys.Select)
+			{
+				this.transform.position.set(0, 0, 0);
+			}
 			let euler = new THREE.Euler().setFromQuaternion(this.transform.rotation);
 			euler.z -= (Input.keys.TurnRight - Input.keys.TurnLeft) * timescale;
 			this.transform.rotation.setFromEuler(euler);
@@ -75,8 +82,25 @@ export class PlayerCharacter extends Character
 
 			velocity.multiplyScalar(speed);
 
-			this.transform.position.add(velocity);
-			this.transform.position.z = (this.world as DebugWorld).terrain.getHeightAt(this.transform.position.x, this.transform.position.y);
+			this.velocity.add(velocity);
+
+			let groundZ = (this.world as DebugWorld).terrain.getHeightAt(this.transform.position.x + this.velocity.x, this.transform.position.y + this.velocity.y);
+
+			this.velocity.z -= 4 * timescale;
+
+			this.transform.position.add(this.velocity);
+			if (this.transform.position.z < groundZ)
+			{
+				if (Input.keys.Jump)
+				{
+					this.velocity.z += 3;
+				}
+				let delta = groundZ - this.transform.position.z;
+				this.transform.position.z = groundZ;
+				this.velocity.x *= 0.8;
+				this.velocity.y *= 0.8;
+				this.velocity.z += delta;
+			}
 		}
 	}
 
