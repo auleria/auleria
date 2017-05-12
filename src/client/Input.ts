@@ -125,6 +125,7 @@ export class Input
 		let gamepad = gps.find((gp) => gp !== null && /Xbox/.test(gp.id));
 		if (gamepad)
 		{
+			this.gamepad = gamepad;
 			if (this.gamepadTimestamp !== gamepad.timestamp)
 			{
 				for (var inputName in Input.gamepadmap)
@@ -148,6 +149,13 @@ export class Input
 				}
 			}
 			this.gamepadTimestamp = gamepad.timestamp;
+		}
+		else if (!gamepad && this.gamepad) {
+			for (let k in this.keys) {
+				(this.keys as any)[k] = 0;
+			}
+			console.log("Gamepad disconnected", this.gamepad.id);
+			this.gamepad = null;
 		}
 		requestAnimationFrame(() => Input.updateGamepads());
 	}
