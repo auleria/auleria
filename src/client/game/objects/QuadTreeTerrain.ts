@@ -12,7 +12,6 @@ export class QuadTreeTerrain extends GameObject
 	public poi : THREE.Vector3;
 	private t = 0;
 
-	private mesh : THREE.Mesh;
 	private geom : THREE.Geometry;
 
 	private quadSize : number;
@@ -37,9 +36,8 @@ export class QuadTreeTerrain extends GameObject
 				this.tree.set(x, y, new Quad(null, 0, new THREE.Vector3(xx, yy), this.quadSize));
 			}
 		}
-		this.mesh = new THREE.Mesh(new THREE.SphereGeometry(1), new THREE.MeshNormalMaterial());
-		this.world.scene.add(this.mesh);
-		this.poi = this.mesh.position;
+
+		this.poi = new THREE.Vector3(0, 0, 0);
 		this.poi.z = 2;
 
 		this.geom = new THREE.Geometry();
