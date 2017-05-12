@@ -58,9 +58,9 @@ export class Tween
 		if (Tween.enabled)
 		{
 			Tween.properties.forEach(prop => {
-				if ( Date.now() - prop.time < 200 )
+				if ( Date.now() - prop.time < 50 )
 				{
-					prop.value += prop.distance / Tween.tickrate;
+					prop.value += prop.distance / 3;
 				}
 			});
 		}
