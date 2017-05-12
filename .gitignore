@@ -1,6 +1,7 @@
 # Compiled stuff
 bin/**/*.js
 bin/**/*.js.map
+bin/**/*.html
 style/*.css
 
 # Tmp compilations
