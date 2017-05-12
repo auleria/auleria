@@ -13,7 +13,8 @@ export class Input
 		StrafeRight: "d",
 		Sprint: "Shift",
 		Jump: " ",
-		Menu: "Escape",
+		Menu: "m",
+		Select: "n",
 		Confirm: "Enter",
 		Up: "ArrowUp",
 		Down: "ArrowDown",
@@ -34,6 +35,7 @@ export class Input
 		Sprint: 0,
 		Jump: 0,
 		Menu: 0,
+		Select: 0,
 		Confirm: 0,
 		Up: 0,
 		Down: 0,
@@ -71,6 +73,15 @@ export class Input
 		},
 		Sprint: {
 			button: 7
+		},
+		Jump: {
+			button: 3
+		},
+		Menu: {
+			button: 9
+		},
+		Select: {
+			button: 8
 		}
 	};
 
@@ -82,7 +93,7 @@ export class Input
 	{
 		window.addEventListener("gamepadconnected", (e : GamepadEvent) => {
 			Input.gamepads.push(e.gamepad);
-			if (e.gamepad !== null && /Xbox/.test(e.gamepad.id))
+			if (e.gamepad !== null && /(Xbox)|(ASUS)/.test(e.gamepad.id))
 			{
 				this.gamepad = e.gamepad;
 			}
@@ -122,7 +133,7 @@ export class Input
 	private static updateGamepads()
 	{
 		let gps = Array.from(navigator.getGamepads());
-		let gamepad = gps.find((gp) => gp !== null && /Xbox/.test(gp.id));
+		let gamepad = gps.find((gp) => gp !== null && /(Xbox)|(ASUS)/.test(gp.id));
 		if (gamepad)
 		{
 			if (this.gamepadTimestamp !== gamepad.timestamp)
