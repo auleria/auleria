@@ -14,6 +14,7 @@ import { Input } from "./Input";
 import { StatsHandler } from "./StatsHandler";
 import { Profiler } from "./Profiler";
 import { ProfileWindow } from "./windows/ProfileWindow";
+import { Debug } from "./interface/Debug";
 
 declare let Peer : any;
 let t = THREE;
@@ -35,9 +36,13 @@ async function main()
 		await gameManager.prepareNetwork(id);
 		Input.initialize();
 		StatsHandler.initialize();
-		
-		Commands.register("profile", () => new ProfileWindow(Profiler.top.children.get("update")));
 
+		Commands.register("profile", () => new ProfileWindow(Profiler.top.children.get("update")));
+		if (getHashParameter("guitest"))
+		{
+			let t = new Debug();
+			return;
+		}
 		if (host)
 		{
 			let remote = await gameManager.connectToRemote(host);
