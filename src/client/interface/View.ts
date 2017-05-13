@@ -62,6 +62,11 @@ export class View
 		}
 	}
 
+	protected getBinding(name : string)
+	{
+		return this.boundElements.find(e => e.name === name);
+	}
+
 	private triggerEvent(eventName : string, e : Event)
 	{
 		if ((this as any)[eventName])
