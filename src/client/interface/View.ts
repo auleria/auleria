@@ -99,6 +99,8 @@ export class View
 		this.host.style.position = "absolute";
 		this.host.style.left = "0";
 		this.host.style.top = "0";
+		this.host.style.width = "100%";
+		this.host.style.height = "100%";
 
 		if (this.isVisible)
 		{
