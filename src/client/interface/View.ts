@@ -6,7 +6,7 @@ export class View
 	protected shadowDOM : ShadowRoot = null;
 	private host : HTMLElement = null;
 	private source : any = null;
-	private boundElements = new Array<{name: string, events: {name: string, callback: string}[], element: Element}>();
+	private boundElements = new Array<{name: string, events: {name: string, callback: string}[], element: HTMLElement}>();
 	private isVisible : boolean = false;
 
 	public setSource(source : any)
