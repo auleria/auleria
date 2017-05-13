@@ -88,7 +88,7 @@ export class View
 			let res = {
 				name: element.getAttribute("bind"),
 				events: eventAttributes.map(a => ({name: a.name.substr(a.name.indexOf("-") + 1), callback: a.value})),
-				element
+				element: element as HTMLElement
 			};
 			return res;
 		});
