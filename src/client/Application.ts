@@ -78,7 +78,7 @@ function getHashParameter(name : string) : any
 		if (str.startsWith(name))
 		{
 			let split = str.split("=");
-			value = split.length > 1 ? split[1] : false;
+			value = split.length > 1 ? split[1] : true;
 			return true;
 		}
 		return false;
