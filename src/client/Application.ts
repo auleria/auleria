@@ -19,7 +19,7 @@ import { EngineTest } from "../engine/EngineTest";
 
 declare let Peer : any;
 let t = THREE;
-main();
+window.addEventListener("load", () => main());
 async function main()
 {
 	Profiler.initialize();
@@ -33,8 +33,6 @@ async function main()
 		let id = getHashParameter("id");
 		let host = getHashParameter("host");
 
-		let gameManager = new GameManager();
-		await gameManager.prepareNetwork(id);
 		Input.initialize();
 		StatsHandler.initialize();
 
@@ -49,6 +47,9 @@ async function main()
 			new EngineTest();
 			return;
 		}
+
+		let gameManager = new GameManager();
+		await gameManager.prepareNetwork(id);
 		if (host)
 		{
 			let remote = await gameManager.connectToRemote(host);
