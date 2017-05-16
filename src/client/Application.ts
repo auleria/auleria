@@ -15,6 +15,7 @@ import { StatsHandler } from "./StatsHandler";
 import { Profiler } from "./Profiler";
 import { ProfileWindow } from "./windows/ProfileWindow";
 import { Debug } from "./interface/Debug";
+import { EngineTest } from "../engine/EngineTest";
 
 declare let Peer : any;
 let t = THREE;
@@ -41,6 +42,11 @@ async function main()
 		if (getHashParameter("guitest"))
 		{
 			let t = new Debug();
+			return;
+		}
+		if (getHashParameter("webgl2"))
+		{
+			new EngineTest();
 			return;
 		}
 		if (host)
